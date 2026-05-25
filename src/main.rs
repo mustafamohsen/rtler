@@ -1,7 +1,19 @@
 use std::io::{self, Read};
 
 fn main() -> io::Result<()> {
-    let input = if let Some(text) = std::env::args().nth(1) {
+    let arg = std::env::args().nth(1);
+
+    if matches!(arg.as_deref(), Some("--help") | Some("-h")) {
+        println!("Usage: rtler [TEXT]\n\nTransform Arabic-script text for non-RTL/non-shaping environments.\n\nIf TEXT is omitted, rtler reads stdin and writes transformed text to stdout.");
+        return Ok(());
+    }
+
+    if matches!(arg.as_deref(), Some("--version") | Some("-V")) {
+        println!("rtler {}", env!("CARGO_PKG_VERSION"));
+        return Ok(());
+    }
+
+    let input = if let Some(text) = arg {
         text
     } else {
         let mut input = String::new();
