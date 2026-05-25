@@ -28,6 +28,8 @@ private final class FloatingButtonView: NSView {
         layer?.shadowOpacity = 0.22
         layer?.shadowRadius = 8
         layer?.shadowOffset = NSSize(width: 0, height: -2)
+        layer?.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        layer?.position = CGPoint(x: frame.midX, y: frame.midY)
 
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
@@ -129,7 +131,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func createFloatingButton() {
         let buttonSize = NSSize(width: 56, height: 56)
-        let panelSize = NSSize(width: 68, height: 68)
+        let panelSize = NSSize(width: 80, height: 80)
         panel = NSPanel(
             contentRect: NSRect(origin: NSPoint(x: 80, y: 500), size: panelSize),
             styleMask: [.borderless, .nonactivatingPanel],
