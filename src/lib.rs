@@ -61,9 +61,15 @@ fn collect_letters(input: &str) -> Vec<ArabicLetter> {
     let mut index = 0;
 
     while index < chars.len() {
-        if chars[index] == 'ل' && index + 1 < chars.len() && chars[index + 1] == 'ا' {
-            letters.push(ArabicLetter::lam_alef(chars[index]));
-            index += 2;
+        if chars[index] == 'ل' && index + 1 < chars.len() {
+            if let Some(lam_alef) = LamAlef::for_alef(chars[index + 1]) {
+                letters.push(ArabicLetter::lam_alef(chars[index], lam_alef));
+                index += 2;
+                continue;
+            }
+
+            letters.push(ArabicLetter::from(chars[index]));
+            index += 1;
         } else {
             letters.push(ArabicLetter::from(chars[index]));
             index += 1;
@@ -89,14 +95,11 @@ impl ArabicLetter {
         }
     }
 
-    fn lam_alef(base: char) -> Self {
+    fn lam_alef(base: char, lam_alef: LamAlef) -> Self {
         Self {
             base,
             forms: None,
-            lam_alef: Some(LamAlef {
-                isolated: 'ﻻ',
-                final_form: 'ﻼ',
-            }),
+            lam_alef: Some(lam_alef),
         }
     }
 
@@ -122,6 +125,30 @@ struct Forms {
 struct LamAlef {
     isolated: char,
     final_form: char,
+}
+
+impl LamAlef {
+    fn for_alef(alef: char) -> Option<Self> {
+        match alef {
+            'آ' => Some(Self {
+                isolated: 'ﻵ',
+                final_form: 'ﻶ',
+            }),
+            'أ' => Some(Self {
+                isolated: 'ﻷ',
+                final_form: 'ﻸ',
+            }),
+            'إ' => Some(Self {
+                isolated: 'ﻹ',
+                final_form: 'ﻺ',
+            }),
+            'ا' => Some(Self {
+                isolated: 'ﻻ',
+                final_form: 'ﻼ',
+            }),
+            _ => None,
+        }
+    }
 }
 
 fn dual(isolated: char, final_form: char, initial: char, medial: char) -> Forms {
