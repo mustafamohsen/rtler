@@ -2,5 +2,10 @@
 name = "rtler"
 version = "0.1.0"
 edition = "2024"
+description = "Convert Arabic-script text into visual-order compatibility text for non-RTL tools"
+repository = "https://github.com/mustafamohsen/rtler"
+license = "MIT"
+keywords = ["arabic", "rtl", "urdu", "persian", "unicode"]
+categories = ["command-line-utilities", "text-processing"]
 
 [dependencies]
