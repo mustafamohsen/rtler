@@ -17,6 +17,14 @@ fn keeps_basic_marks_attached_to_their_base_letters() {
 }
 
 #[test]
+fn preserves_digit_runs_in_left_to_right_order() {
+    let result = transform("سلام 123");
+
+    assert_eq!(result.output, "123 ﻡﻼﺳ");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn emits_lam_alef_ligatures_for_common_alef_variants() {
     assert_eq!(transform("لا").output, "ﻻ");
     assert_eq!(transform("لأ").output, "ﻷ");

@@ -26,6 +26,10 @@ fn shape(input: &str) -> Vec<String> {
         .enumerate()
         .map(|(index, letter)| {
             let mut cluster = String::new();
+            if let Some(literal) = &letter.literal {
+                return literal.clone();
+            }
+
             let shaped = if let Some(ligature) = letter.lam_alef {
                 let previous_joins_to_current = index > 0
                     && letters[index - 1].can_connect_to_left()
@@ -66,6 +70,16 @@ fn collect_letters(input: &str) -> Vec<ArabicLetter> {
     let mut index = 0;
 
     while index < chars.len() {
+        if is_digit(chars[index]) {
+            let mut literal = String::new();
+            while index < chars.len() && is_digit(chars[index]) {
+                literal.push(chars[index]);
+                index += 1;
+            }
+            raw.push(ArabicLetter::literal(literal));
+            continue;
+        }
+
         let base = chars[index];
         index += 1;
         let mut marks = Vec::new();
@@ -100,10 +114,15 @@ fn is_basic_arabic_mark(ch: char) -> bool {
     matches!(ch, '\u{064B}'..='\u{065F}' | '\u{0670}')
 }
 
+fn is_digit(ch: char) -> bool {
+    ch.is_ascii_digit() || matches!(ch, '\u{0660}'..='\u{0669}' | '\u{06F0}'..='\u{06F9}')
+}
+
 #[derive(Debug, Clone)]
 struct ArabicLetter {
     base: char,
     marks: Vec<char>,
+    literal: Option<String>,
     forms: Option<Forms>,
     lam_alef: Option<LamAlef>,
 }
@@ -113,6 +132,7 @@ impl ArabicLetter {
         Self {
             base,
             marks,
+            literal: None,
             forms: forms_for(base),
             lam_alef: None,
         }
@@ -122,8 +142,19 @@ impl ArabicLetter {
         Self {
             base,
             marks,
+            literal: None,
             forms: None,
             lam_alef: Some(lam_alef),
+        }
+    }
+
+    fn literal(literal: String) -> Self {
+        Self {
+            base: '\0',
+            marks: Vec::new(),
+            literal: Some(literal),
+            forms: None,
+            lam_alef: None,
         }
     }
 
