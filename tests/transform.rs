@@ -9,6 +9,17 @@ fn shapes_and_reverses_a_pure_arabic_word() {
 }
 
 #[test]
+fn covers_common_arabic_letters_in_real_sentence() {
+    let result = transform("هذا ليس من شأنك! اذهب في كتبك الآن! لنْ نَلين");
+
+    assert_eq!(
+        result.output,
+        "ﻦﻴﻠﻧَ ﻦْﻟ !ﻥﻵﺍ ﻚﺒﺘﻛ ﻲﻓ ﺐﻫﺫﺍ !ﻚﻧﺄﺷ ﻦﻣ ﺲﻴﻟ ﺍﺬﻫ"
+    );
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn shapes_persian_letters() {
     let result = transform("فارسی");
 
