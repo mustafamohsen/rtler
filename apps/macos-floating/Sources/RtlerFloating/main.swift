@@ -128,9 +128,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func createFloatingButton() {
-        let size = NSSize(width: 56, height: 56)
+        let buttonSize = NSSize(width: 56, height: 56)
+        let panelSize = NSSize(width: 68, height: 68)
         panel = NSPanel(
-            contentRect: NSRect(origin: NSPoint(x: 80, y: 500), size: size),
+            contentRect: NSRect(origin: NSPoint(x: 80, y: 500), size: panelSize),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -142,7 +143,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         panel.backgroundColor = .clear
         panel.isOpaque = false
 
-        buttonView = FloatingButtonView(frame: NSRect(origin: .zero, size: size))
+        buttonView = FloatingButtonView(
+            frame: NSRect(
+                x: (panelSize.width - buttonSize.width) / 2,
+                y: (panelSize.height - buttonSize.height) / 2,
+                width: buttonSize.width,
+                height: buttonSize.height
+            )
+        )
         buttonView.onClick = { [weak self] in
             self?.convertSelection()
         }
