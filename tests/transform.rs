@@ -130,6 +130,14 @@ fn preserves_digit_runs_in_left_to_right_order() {
 }
 
 #[test]
+fn preserves_ascii_word_runs_in_mixed_arabic_text() {
+    let result = transform("Adobe يدعم العربية");
+
+    assert_eq!(result.output, "ﺔﻴﺑﺮﻌﻟﺍ ﻢﻋﺪﻳ Adobe");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn preserves_common_numeric_runs_in_arabic_text() {
     let result = transform("السعر ١٢٫٥٠ والخصم 50% في 2026/05/25");
 
