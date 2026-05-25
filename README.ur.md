@@ -1,5 +1,9 @@
 # RTLer
 
+<p align="center">
+  <img src="assets/logo/rtler-logo.svg" alt="RTLer لوگو" width="112" height="112">
+</p>
+
 [![CI](https://github.com/mustafamohsen/rtler/actions/workflows/ci.yml/badge.svg)](https://github.com/mustafamohsen/rtler/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/mustafamohsen/rtler?include_prereleases&label=release)](https://github.com/mustafamohsen/rtler/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
