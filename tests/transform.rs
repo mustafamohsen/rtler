@@ -25,6 +25,15 @@ fn shapes_common_urdu_letters() {
 }
 
 #[test]
+fn passes_through_unsupported_arabic_script_characters_with_warning() {
+    let result = transform("سݨ");
+
+    assert_eq!(result.output, "ݨﺱ");
+    assert_eq!(result.warnings.len(), 1);
+    assert_eq!(result.warnings[0].character, 'ݨ');
+}
+
+#[test]
 fn keeps_basic_marks_attached_to_their_base_letters() {
     let result = transform("سَلَام");
 

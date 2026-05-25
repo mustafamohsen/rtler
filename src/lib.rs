@@ -11,24 +11,22 @@ pub struct Warning {
 }
 
 pub fn transform(input: &str) -> TransformResult {
+    let mut warnings = Vec::new();
     let output = input
         .split('\n')
-        .map(transform_line)
+        .map(|line| transform_line(line, &mut warnings))
         .collect::<Vec<_>>()
         .join("\n");
 
-    TransformResult {
-        output,
-        warnings: Vec::new(),
-    }
+    TransformResult { output, warnings }
 }
 
-fn transform_line(input: &str) -> String {
-    let shaped = shape(input);
+fn transform_line(input: &str, warnings: &mut Vec<Warning>) -> String {
+    let shaped = shape(input, warnings);
     shaped.into_iter().rev().collect::<String>()
 }
 
-fn shape(input: &str) -> Vec<String> {
+fn shape(input: &str, warnings: &mut Vec<Warning>) -> Vec<String> {
     let letters = collect_letters(input);
 
     letters
@@ -64,6 +62,12 @@ fn shape(input: &str) -> Vec<String> {
                     (false, false) => forms.isolated,
                 }
             } else {
+                if is_unsupported_arabic_script_letter(letter.base) {
+                    warnings.push(Warning {
+                        character: letter.base,
+                        message: "no presentation-form mapping; passed through unchanged".to_string(),
+                    });
+                }
                 mirrored_bracket(letter.base).unwrap_or(letter.base)
             };
 
@@ -126,6 +130,11 @@ fn is_basic_arabic_mark(ch: char) -> bool {
 
 fn is_digit(ch: char) -> bool {
     ch.is_ascii_digit() || matches!(ch, '\u{0660}'..='\u{0669}' | '\u{06F0}'..='\u{06F9}')
+}
+
+fn is_unsupported_arabic_script_letter(ch: char) -> bool {
+    matches!(ch, '\u{0600}'..='\u{06FF}' | '\u{0750}'..='\u{077F}' | '\u{08A0}'..='\u{08FF}')
+        && !is_basic_arabic_mark(ch)
 }
 
 fn mirrored_bracket(ch: char) -> Option<char> {
