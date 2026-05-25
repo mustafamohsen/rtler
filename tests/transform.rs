@@ -23,6 +23,25 @@ fn matches_mixed_arabic_smoke_fixture() {
 }
 
 #[test]
+fn matches_urdu_smoke_fixture() {
+    let result = transform(include_str!("../fixtures/urdu-smoke-input.txt"));
+
+    assert_eq!(result.output, include_str!("../fixtures/urdu-smoke-expected.txt"));
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
+fn matches_persian_smoke_fixture() {
+    let result = transform(include_str!("../fixtures/persian-smoke-input.txt"));
+
+    assert_eq!(
+        result.output,
+        include_str!("../fixtures/persian-smoke-expected.txt")
+    );
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn shapes_and_reverses_a_pure_arabic_word() {
     let result = transform("سلام");
 
@@ -89,6 +108,22 @@ fn shapes_persian_letters() {
 
     assert_eq!(result.output, "ﯽﺳﺭﺎﻓ");
     assert!(result.warnings.is_empty());
+}
+
+#[test]
+fn shapes_common_persian_sentences_without_warnings() {
+    let cases = [
+        "این یک متن فارسی است.",
+        "سلام دنیا",
+        "کتاب‌ها روی میز هستند.",
+        "قیمت ۱۲٫۵۰ است.",
+        "نسخه v1.0 آماده است.",
+    ];
+
+    for input in cases {
+        let result = transform(input);
+        assert!(result.warnings.is_empty(), "input: {input}; warnings: {:?}", result.warnings);
+    }
 }
 
 #[test]
