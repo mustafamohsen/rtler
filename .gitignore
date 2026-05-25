@@ -1,1 +1,7 @@
 /target
+
+# SwiftPM build artifacts
+apps/macos-floating/.build/
+
+# Local packaged app artifacts
+/dist/

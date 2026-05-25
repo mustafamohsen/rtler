@@ -1,3 +1,6 @@
+use std::ffi::{CStr, CString};
+use std::os::raw::c_char;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TransformResult {
     pub output: String,
@@ -8,6 +11,34 @@ pub struct TransformResult {
 pub struct Warning {
     pub character: char,
     pub message: String,
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn rtler_transform_text(input: *const c_char) -> *mut c_char {
+    if input.is_null() {
+        return std::ptr::null_mut();
+    }
+
+    let input = unsafe { CStr::from_ptr(input) };
+    let Ok(input) = input.to_str() else {
+        return std::ptr::null_mut();
+    };
+
+    match CString::new(transform(input).output) {
+        Ok(output) => output.into_raw(),
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn rtler_free_string(ptr: *mut c_char) {
+    if ptr.is_null() {
+        return;
+    }
+
+    unsafe {
+        drop(CString::from_raw(ptr));
+    }
 }
 
 pub fn transform(input: &str) -> TransformResult {

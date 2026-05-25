@@ -8,4 +8,7 @@ license = "MIT"
 keywords = ["arabic", "rtl", "urdu", "persian", "unicode"]
 categories = ["command-line-utilities", "text-processing"]
 
+[lib]
+crate-type = ["rlib", "staticlib", "cdylib"]
+
 [dependencies]
