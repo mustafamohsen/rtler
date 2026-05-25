@@ -106,6 +106,14 @@ fn keeps_basic_marks_attached_to_their_base_letters() {
 }
 
 #[test]
+fn keeps_multi_mark_clusters_attached_to_their_base_letters() {
+    let result = transform("مُحَمَّد");
+
+    assert_eq!(result.output, "ﺪﻤَّﺤَﻣُ");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn handles_arabic_punctuation_without_warnings() {
     let result = transform("هل تكتب؟ نعم، أكتب؛ الآن.");
 
