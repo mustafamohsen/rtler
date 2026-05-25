@@ -185,11 +185,11 @@ fn is_digit(ch: char) -> bool {
 }
 
 fn is_ltr_token_start(ch: char) -> bool {
-    ch.is_ascii_alphanumeric() || is_digit(ch)
+    ch.is_ascii_alphanumeric() || is_digit(ch) || matches!(ch, '@' | '#')
 }
 
 fn is_ltr_token_char(ch: char) -> bool {
-    ch.is_ascii_alphanumeric() || is_numeric_run_char(ch) || matches!(ch, '@' | '-' | '_')
+    ch.is_ascii_alphanumeric() || is_numeric_run_char(ch) || matches!(ch, '@' | '#' | '-' | '_')
 }
 
 fn is_numeric_run_char(ch: char) -> bool {

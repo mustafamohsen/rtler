@@ -149,6 +149,17 @@ fn preserves_urls_and_emails_in_mixed_arabic_text() {
 }
 
 #[test]
+fn preserves_handles_hashtags_versions_and_filenames() {
+    let result = transform("افتح guide-v1.2.pdf وتابع @rtler و #Arabic الآن");
+
+    assert_eq!(
+        result.output,
+        "ﻥﻵﺍ #Arabic ﻭ @rtler ﻊﺑﺎﺗﻭ guide-v1.2.pdf ﺢﺘﻓﺍ"
+    );
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn preserves_common_numeric_runs_in_arabic_text() {
     let result = transform("السعر ١٢٫٥٠ والخصم 50% في 2026/05/25");
 
