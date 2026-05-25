@@ -185,8 +185,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func createStatusMenu() {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.title = "RTL"
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        if let statusIcon = loadStatusIcon() {
+            statusIcon.size = NSSize(width: 18, height: 18)
+            statusIcon.isTemplate = true
+            statusItem.button?.image = statusIcon
+            statusItem.button?.imagePosition = .imageOnly
+        } else {
+            statusItem.button?.title = "RTL"
+        }
 
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Show Floating Button", action: #selector(showFloatingButton), keyEquivalent: ""))
@@ -197,6 +204,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit RTLer", action: #selector(quit), keyEquivalent: "q"))
         statusItem.menu = menu
+    }
+
+    private func loadStatusIcon() -> NSImage? {
+        let fileManager = FileManager.default
+        let candidateURLs: [URL] = [
+            Bundle.main.url(forResource: "MenuBarIconTemplate", withExtension: "png"),
+            URL(fileURLWithPath: fileManager.currentDirectoryPath)
+                .appendingPathComponent("Resources/MenuBarIconTemplate.png"),
+            URL(fileURLWithPath: fileManager.currentDirectoryPath)
+                .appendingPathComponent("apps/macos-floating/Resources/MenuBarIconTemplate.png")
+        ].compactMap { $0 }
+
+        for url in candidateURLs where fileManager.fileExists(atPath: url.path) {
+            if let image = NSImage(contentsOf: url) {
+                return image
+            }
+        }
+        return nil
     }
 
     @objc private func showFloatingButton() {
