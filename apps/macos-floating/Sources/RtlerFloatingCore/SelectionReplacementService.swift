@@ -7,6 +7,11 @@ public enum ReplacementError: Error, Equatable {
     case transformFailed
 }
 
+public enum ReplacementOutcome: Equatable {
+    case selectionReplaced
+    case clipboardTransformed
+}
+
 public struct ClipboardSnapshot: Equatable {
     public let string: String?
 
@@ -158,7 +163,7 @@ public final class SelectionReplacementService {
         self.sleep = sleep
     }
 
-    public func replaceSelection() throws {
+    public func replaceSelection() throws -> ReplacementOutcome {
         guard permissions.canControlComputer() else {
             throw ReplacementError.accessibilityPermissionRequired
         }
@@ -173,12 +178,13 @@ public final class SelectionReplacementService {
         let preCopyChangeCount = clipboard.changeCount()
         NSLog("RTLER service: sending copy")
         keyboard.copy()
-        waitForPasteboardChange(after: preCopyChangeCount, timeout: 0.50)
+        let copyChangedClipboard = waitForPasteboardChange(after: preCopyChangeCount, timeout: 0.50)
 
-        guard let selectedText = clipboard.string(), !selectedText.isEmpty else {
+        let copiedText = clipboard.string()
+        let copyProducedSelection = copyChangedClipboard || copiedText != originalClipboard.string
+        guard copyProducedSelection, let selectedText = copiedText, !selectedText.isEmpty else {
             NSLog("RTLER service: no selected text found")
-            clipboard.restore(originalClipboard)
-            throw ReplacementError.noSelectedText
+            return try transformClipboardFallback(originalClipboard)
         }
         NSLog("RTLER service: copied \(selectedText.count) characters")
 
@@ -201,6 +207,7 @@ public final class SelectionReplacementService {
         sleep(pasteRestoreDelay)
         NSLog("RTLER service: restoring clipboard")
         clipboard.restore(originalClipboard)
+        return .selectionReplaced
     }
 
     public static func defaultPasteRestoreDelay() -> TimeInterval {
@@ -212,13 +219,47 @@ public final class SelectionReplacementService {
         return delay
     }
 
-    private func waitForPasteboardChange(after initialChangeCount: Int, timeout: TimeInterval) {
+    private func transformClipboardFallback(_ originalClipboard: ClipboardSnapshot) throws -> ReplacementOutcome {
+        guard let clipboardText = originalClipboard.string,
+              !clipboardText.isEmpty,
+              Self.containsArabicScript(clipboardText) else {
+            clipboard.restore(originalClipboard)
+            throw ReplacementError.noSelectedText
+        }
+
+        guard let transformed = transformer.transform(clipboardText) else {
+            clipboard.restore(originalClipboard)
+            throw ReplacementError.transformFailed
+        }
+
+        NSLog("RTLER service: transformed Arabic clipboard text to \(transformed.count) characters")
+        clipboard.setString(transformed)
+        return .clipboardTransformed
+    }
+
+    public static func containsArabicScript(_ text: String) -> Bool {
+        text.unicodeScalars.contains { scalar in
+            switch scalar.value {
+            case 0x0600 ... 0x06FF,
+                 0x0750 ... 0x077F,
+                 0x08A0 ... 0x08FF,
+                 0xFB50 ... 0xFDFF,
+                 0xFE70 ... 0xFEFF:
+                return true
+            default:
+                return false
+            }
+        }
+    }
+
+    private func waitForPasteboardChange(after initialChangeCount: Int, timeout: TimeInterval) -> Bool {
         let deadline = Date().addingTimeInterval(timeout)
         repeat {
             if clipboard.changeCount() != initialChangeCount {
-                return
+                return true
             }
             sleep(0.02)
         } while Date() < deadline
+        return false
     }
 }

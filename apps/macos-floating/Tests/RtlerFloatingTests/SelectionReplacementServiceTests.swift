@@ -17,14 +17,37 @@ final class SelectionReplacementServiceTests: XCTestCase {
             sleep: { _ in }
         )
 
-        try service.replaceSelection()
+        let outcome = try service.replaceSelection()
 
+        XCTAssertEqual(outcome, .selectionReplaced)
         XCTAssertEqual(keyboard.events, ["copy", "paste"])
         XCTAssertEqual(clipboard.pastedText, "ﻡﻼﺳ")
         XCTAssertEqual(clipboard.currentText, "original")
     }
 
-    func testRestoresClipboardWhenNoTextIsSelected() throws {
+    func testTransformsArabicClipboardWhenNoTextIsSelected() throws {
+        let clipboard = FakeClipboard(selectedTextAfterCopy: nil, originalText: "سلام")
+        let keyboard = FakeKeyboard()
+        let service = SelectionReplacementService(
+            clipboard: clipboard,
+            keyboard: keyboard,
+            transformer: FakeTransformer(output: "ﻡﻼﺳ"),
+            permissions: FakePermissions(allowed: true),
+            frontmostApplicationProvider: FakeFrontmostApplicationProvider(),
+            applicationActivator: FakeApplicationActivator(),
+            pasteRestoreDelay: 0,
+            sleep: { _ in }
+        )
+
+        let outcome = try service.replaceSelection()
+
+        XCTAssertEqual(outcome, .clipboardTransformed)
+        XCTAssertEqual(keyboard.events, ["copy"])
+        XCTAssertEqual(clipboard.pastedText, "ﻡﻼﺳ")
+        XCTAssertEqual(clipboard.currentText, "ﻡﻼﺳ")
+    }
+
+    func testRestoresClipboardWhenNoTextIsSelectedAndClipboardIsNotArabic() throws {
         let clipboard = FakeClipboard(selectedTextAfterCopy: nil, originalText: "original")
         let keyboard = FakeKeyboard()
         let service = SelectionReplacementService(
@@ -86,7 +109,7 @@ private final class FakeClipboard: ClipboardStore {
     }
 
     func string() -> String? {
-        selectedTextAfterCopy
+        selectedTextAfterCopy ?? currentText
     }
 
     func setString(_ string: String) {
