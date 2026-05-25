@@ -135,6 +135,15 @@ fn is_digit(ch: char) -> bool {
 fn is_unsupported_arabic_script_letter(ch: char) -> bool {
     matches!(ch, '\u{0600}'..='\u{06FF}' | '\u{0750}'..='\u{077F}' | '\u{08A0}'..='\u{08FF}')
         && !is_basic_arabic_mark(ch)
+        && !is_arabic_punctuation_or_symbol(ch)
+        && !is_digit(ch)
+}
+
+fn is_arabic_punctuation_or_symbol(ch: char) -> bool {
+    matches!(
+        ch,
+        '\u{060C}' | '\u{061B}' | '\u{061F}' | '\u{0640}' | '\u{066A}'..='\u{066D}'
+    )
 }
 
 fn mirrored_bracket(ch: char) -> Option<char> {

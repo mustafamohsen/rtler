@@ -66,6 +66,14 @@ fn keeps_basic_marks_attached_to_their_base_letters() {
 }
 
 #[test]
+fn handles_arabic_punctuation_without_warnings() {
+    let result = transform("هل تكتب؟ نعم، أكتب؛ الآن.");
+
+    assert_eq!(result.output, ".ﻥﻵﺍ ؛ﺐﺘﻛﺃ ،ﻢﻌﻧ ؟ﺐﺘﻜﺗ ﻞﻫ");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn preserves_digit_runs_in_left_to_right_order() {
     let result = transform("سلام 123");
 
