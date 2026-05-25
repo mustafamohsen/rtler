@@ -76,14 +76,14 @@ private final class FloatingButtonView: NSView {
     }
 
     func showFeedback(title: String, color: NSColor, duration: TimeInterval = 0.55) {
-        animateFeedbackTransition(title: title, color: color, scale: 1.06)
+        animateFeedbackTransition(title: title, color: color)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
-            self?.animateFeedbackTransition(title: "RTL", color: .systemBlue, scale: 1.0)
+            self?.animateFeedbackTransition(title: "RTL", color: .systemBlue)
         }
     }
 
-    private func animateFeedbackTransition(title: String, color: NSColor, scale: CGFloat) {
+    private func animateFeedbackTransition(title: String, color: NSColor) {
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.16
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
@@ -106,15 +106,6 @@ private final class FloatingButtonView: NSView {
         colorAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
         layer.add(colorAnimation, forKey: "rtler.feedback.backgroundColor")
         layer.backgroundColor = color.cgColor
-
-        let scaleAnimation = CABasicAnimation(keyPath: "transform.scale")
-        scaleAnimation.fromValue = layer.presentation()?.value(forKeyPath: "transform.scale") ?? 1.0
-        scaleAnimation.toValue = scale
-        scaleAnimation.duration = 0.18
-        scaleAnimation.timingFunction = CAMediaTimingFunction(name: .easeOut)
-        scaleAnimation.autoreverses = true
-        layer.add(scaleAnimation, forKey: "rtler.feedback.scale")
-        layer.setAffineTransform(.identity)
     }
 }
 
