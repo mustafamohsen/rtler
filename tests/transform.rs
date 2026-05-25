@@ -36,6 +36,30 @@ fn covers_common_arabic_letters_in_real_sentence() {
 }
 
 #[test]
+fn shapes_representative_arabic_joining_contexts() {
+    let cases = [
+        ("ببب", "ﺐﺒﺑ"),
+        ("تتت", "ﺖﺘﺗ"),
+        ("ججج", "ﺞﺠﺟ"),
+        ("سسس", "ﺲﺴﺳ"),
+        ("ععع", "ﻊﻌﻋ"),
+        ("ففف", "ﻒﻔﻓ"),
+        ("ككك", "ﻚﻜﻛ"),
+        ("ننن", "ﻦﻨﻧ"),
+        ("ههه", "ﻪﻬﻫ"),
+        ("باب", "ﺏﺎﺑ"),
+        ("دبد", "ﺪﺑﺩ"),
+        ("زور", "ﺭﻭﺯ"),
+    ];
+
+    for (input, expected) in cases {
+        let result = transform(input);
+        assert_eq!(result.output, expected, "input: {input}");
+        assert!(result.warnings.is_empty(), "input: {input}");
+    }
+}
+
+#[test]
 fn covers_comprehensive_arabic_smoke_string() {
     let result = transform(
         "ء آ أ ؤ إ ئ ا ب ة ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ى ي لا لأ لإ لآ 123 (اختبار)",
