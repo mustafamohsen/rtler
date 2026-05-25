@@ -12,7 +12,7 @@ let package = Package(
         .target(
             name: "RtlerFloatingCore",
             linkerSettings: [
-                .unsafeFlags(["-L", "../../target/debug", "-lrtler"]),
+                .unsafeFlags(["-L", "../../target/release", "-L", "../../target/debug", "-lrtler"]),
             ]
         ),
         .executableTarget(name: "RtlerFloating", dependencies: ["RtlerFloatingCore"]),
