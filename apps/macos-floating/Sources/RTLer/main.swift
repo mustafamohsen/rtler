@@ -5,11 +5,21 @@ private final class FloatingButtonView: NSView {
     var onClick: (() -> Void)?
     var onDragEnd: (() -> Void)?
 
-    private let label = NSTextField(labelWithString: "RTL")
+    private let backgroundLayer = CAGradientLayer()
+    private let borderLayer = CAShapeLayer()
+    private let innerHighlightLayer = CAShapeLayer()
+    private let topLineLayer = CAShapeLayer()
+    private let middleLineLayer = CAShapeLayer()
+    private let bottomLineLayer = CAShapeLayer()
+    private let directionLayer = CAShapeLayer()
+    private let feedbackLabel = NSTextField(labelWithString: "")
     private var mouseDownScreenLocation: NSPoint?
     private var initialWindowOrigin: NSPoint?
     private var didDrag = false
     private let dragThreshold: CGFloat = 4
+    private let idleTopColor = NSColor(red: 0.067, green: 0.094, blue: 0.145, alpha: 0.96)
+    private let idleBottomColor = NSColor(red: 0.026, green: 0.039, blue: 0.078, alpha: 0.98)
+    private let accentColor = NSColor(red: 0.49, green: 0.827, blue: 0.988, alpha: 1)
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -23,34 +33,96 @@ private final class FloatingButtonView: NSView {
 
     private func setup() {
         wantsLayer = true
-        layer?.cornerRadius = min(bounds.width, bounds.height) / 2
-        layer?.backgroundColor = NSColor.systemBlue.cgColor
+        layer?.masksToBounds = false
         layer?.shadowColor = NSColor.black.cgColor
-        layer?.shadowOpacity = 0.22
-        layer?.shadowRadius = 8
-        layer?.shadowOffset = NSSize(width: 0, height: -2)
+        layer?.shadowOpacity = 0.28
+        layer?.shadowRadius = 18
+        layer?.shadowOffset = NSSize(width: 0, height: -8)
 
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .white
-        label.font = .boldSystemFont(ofSize: 14)
-        label.alignment = .center
-        addSubview(label)
+        backgroundLayer.colors = [cgColor(idleTopColor), cgColor(idleBottomColor)]
+        backgroundLayer.startPoint = CGPoint(x: 0.18, y: 0.08)
+        backgroundLayer.endPoint = CGPoint(x: 0.86, y: 0.94)
+        layer?.addSublayer(backgroundLayer)
+
+        borderLayer.fillColor = NSColor.clear.cgColor
+        borderLayer.strokeColor = NSColor.white.withAlphaComponent(0.14).cgColor
+        borderLayer.lineWidth = 1
+        layer?.addSublayer(borderLayer)
+
+        innerHighlightLayer.fillColor = NSColor.clear.cgColor
+        innerHighlightLayer.strokeColor = NSColor.white.withAlphaComponent(0.08).cgColor
+        innerHighlightLayer.lineWidth = 1
+        layer?.addSublayer(innerHighlightLayer)
+
+        configureGlyphLine(topLineLayer, alpha: 0.92)
+        configureGlyphLine(middleLineLayer, alpha: 0.70)
+        configureGlyphLine(bottomLineLayer, alpha: 0.48)
+        layer?.addSublayer(topLineLayer)
+        layer?.addSublayer(middleLineLayer)
+        layer?.addSublayer(bottomLineLayer)
+
+        directionLayer.fillColor = NSColor.clear.cgColor
+        directionLayer.strokeColor = cgColor(accentColor)
+        directionLayer.lineWidth = 3.1
+        directionLayer.lineCap = .round
+        directionLayer.lineJoin = .round
+        layer?.addSublayer(directionLayer)
+
+        feedbackLabel.translatesAutoresizingMaskIntoConstraints = false
+        feedbackLabel.alphaValue = 0
+        feedbackLabel.textColor = .white
+        feedbackLabel.font = .systemFont(ofSize: 21, weight: .semibold)
+        feedbackLabel.alignment = .center
+        addSubview(feedbackLabel)
 
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: centerYAnchor)
+            feedbackLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            feedbackLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -0.5)
         ])
     }
 
     override func layout() {
         super.layout()
-        layer?.cornerRadius = min(bounds.width, bounds.height) / 2
+        let buttonFrame = bounds.insetBy(dx: 1, dy: 1)
+        let cornerRadius = min(buttonFrame.width, buttonFrame.height) * 0.34
+
+        backgroundLayer.frame = buttonFrame
+        backgroundLayer.cornerRadius = cornerRadius
+        backgroundLayer.cornerCurve = .continuous
+
+        let borderPath = CGPath(
+            roundedRect: buttonFrame,
+            cornerWidth: cornerRadius,
+            cornerHeight: cornerRadius,
+            transform: nil
+        )
+        borderLayer.path = borderPath
+        innerHighlightLayer.path = CGPath(
+            roundedRect: buttonFrame.insetBy(dx: 1.8, dy: 1.8),
+            cornerWidth: max(cornerRadius - 1.8, 0),
+            cornerHeight: max(cornerRadius - 1.8, 0),
+            transform: nil
+        )
+
+        topLineLayer.path = linePath(from: CGPoint(x: buttonFrame.minX + 20, y: buttonFrame.minY + 21),
+                                     to: CGPoint(x: buttonFrame.maxX - 13, y: buttonFrame.minY + 21))
+        middleLineLayer.path = linePath(from: CGPoint(x: buttonFrame.minX + 27, y: buttonFrame.minY + 29),
+                                        to: CGPoint(x: buttonFrame.maxX - 13, y: buttonFrame.minY + 29))
+        bottomLineLayer.path = linePath(from: CGPoint(x: buttonFrame.minX + 23, y: buttonFrame.minY + 37),
+                                        to: CGPoint(x: buttonFrame.maxX - 13, y: buttonFrame.minY + 37))
+
+        let directionPath = CGMutablePath()
+        directionPath.move(to: CGPoint(x: buttonFrame.minX + 20.5, y: buttonFrame.minY + 24.5))
+        directionPath.addLine(to: CGPoint(x: buttonFrame.minX + 14.5, y: buttonFrame.minY + 29))
+        directionPath.addLine(to: CGPoint(x: buttonFrame.minX + 20.5, y: buttonFrame.minY + 33.5))
+        directionLayer.path = directionPath
     }
 
     override func mouseDown(with event: NSEvent) {
         mouseDownScreenLocation = NSEvent.mouseLocation
         initialWindowOrigin = window?.frame.origin
         didDrag = false
+        animatePress(isPressed: true)
     }
 
     override func mouseDragged(with event: NSEvent) {
@@ -68,6 +140,7 @@ private final class FloatingButtonView: NSView {
     }
 
     override func mouseUp(with event: NSEvent) {
+        animatePress(isPressed: false)
         if didDrag {
             onDragEnd?()
         } else {
@@ -82,33 +155,99 @@ private final class FloatingButtonView: NSView {
         animateFeedbackTransition(title: title, color: color)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
-            self?.animateFeedbackTransition(title: "RTL", color: .systemBlue)
+            self?.restoreIdleState()
+        }
+    }
+
+    private func configureGlyphLine(_ layer: CAShapeLayer, alpha: CGFloat) {
+        layer.fillColor = NSColor.clear.cgColor
+        layer.strokeColor = NSColor.white.withAlphaComponent(alpha).cgColor
+        layer.lineWidth = 4.2
+        layer.lineCap = .round
+    }
+
+    private func linePath(from start: CGPoint, to end: CGPoint) -> CGPath {
+        let path = CGMutablePath()
+        path.move(to: start)
+        path.addLine(to: end)
+        return path
+    }
+
+    private func animatePress(isPressed: Bool) {
+        guard let layer else { return }
+        let scale = isPressed ? 0.965 : 1
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.12
+            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            layer.setAffineTransform(CGAffineTransform(scaleX: scale, y: scale))
         }
     }
 
     private func animateFeedbackTransition(title: String, color: NSColor) {
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.16
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            label.animator().alphaValue = 0
-        } completionHandler: { [weak self] in
-            guard let self else { return }
-            self.label.stringValue = title
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.18
-                context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-                self.label.animator().alphaValue = 1
-            }
-        }
+        feedbackLabel.stringValue = title
+        feedbackLabel.textColor = .white
+        setGlyphAlpha(0)
+        setFeedbackAlpha(1)
+        animateGradient(to: feedbackGradient(for: color))
+        animateBorder(to: color.withAlphaComponent(0.34))
+    }
 
-        guard let layer else { return }
-        let colorAnimation = CABasicAnimation(keyPath: "backgroundColor")
-        colorAnimation.fromValue = layer.presentation()?.backgroundColor ?? layer.backgroundColor
-        colorAnimation.toValue = color.cgColor
-        colorAnimation.duration = 0.18
-        colorAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        layer.add(colorAnimation, forKey: "rtler.feedback.backgroundColor")
-        layer.backgroundColor = color.cgColor
+    private func restoreIdleState() {
+        setFeedbackAlpha(0)
+        setGlyphAlpha(1)
+        animateGradient(to: [cgColor(idleTopColor), cgColor(idleBottomColor)])
+        animateBorder(to: NSColor.white.withAlphaComponent(0.14))
+    }
+
+    private func setGlyphAlpha(_ alpha: Float) {
+        [topLineLayer, middleLineLayer, bottomLineLayer, directionLayer].forEach { glyphLayer in
+            let animation = CABasicAnimation(keyPath: "opacity")
+            animation.fromValue = glyphLayer.presentation()?.opacity ?? glyphLayer.opacity
+            animation.toValue = alpha
+            animation.duration = 0.16
+            animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            glyphLayer.add(animation, forKey: "rtler.glyph.opacity")
+            glyphLayer.opacity = alpha
+        }
+    }
+
+    private func setFeedbackAlpha(_ alpha: CGFloat) {
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.18
+            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            feedbackLabel.animator().alphaValue = alpha
+        }
+    }
+
+    private func animateGradient(to colors: [CGColor]) {
+        let animation = CABasicAnimation(keyPath: "colors")
+        animation.fromValue = backgroundLayer.presentation()?.value(forKeyPath: "colors") ?? backgroundLayer.colors
+        animation.toValue = colors
+        animation.duration = 0.22
+        animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        backgroundLayer.add(animation, forKey: "rtler.background.colors")
+        backgroundLayer.colors = colors
+    }
+
+    private func animateBorder(to color: NSColor) {
+        let cgColor = cgColor(color)
+        let animation = CABasicAnimation(keyPath: "strokeColor")
+        animation.fromValue = borderLayer.presentation()?.strokeColor ?? borderLayer.strokeColor
+        animation.toValue = cgColor
+        animation.duration = 0.22
+        animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        borderLayer.add(animation, forKey: "rtler.border.color")
+        borderLayer.strokeColor = cgColor
+    }
+
+    private func feedbackGradient(for color: NSColor) -> [CGColor] {
+        let top = color.blended(withFraction: 0.42, of: idleTopColor) ?? color
+        let bottom = color.blended(withFraction: 0.72, of: idleBottomColor) ?? color
+        return [cgColor(top.withAlphaComponent(0.96)), cgColor(bottom.withAlphaComponent(0.98))]
+    }
+
+    private func cgColor(_ color: NSColor) -> CGColor {
+        (color.usingColorSpace(.sRGB) ?? color).cgColor
     }
 }
 
