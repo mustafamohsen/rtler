@@ -20,6 +20,19 @@ fn covers_common_arabic_letters_in_real_sentence() {
 }
 
 #[test]
+fn covers_comprehensive_arabic_smoke_string() {
+    let result = transform(
+        "ء آ أ ؤ إ ئ ا ب ة ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ى ي لا لأ لإ لآ 123 (اختبار)",
+    );
+
+    assert_eq!(
+        result.output,
+        "(ﺭﺎﺒﺘﺧﺍ) 123 ﻵ ﻹ ﻷ ﻻ ﻱ ﻯ ﻭ ﻩ ﻥ ﻡ ﻝ ﻙ ﻕ ﻑ ﻍ ﻉ ﻅ ﻁ ﺽ ﺹ ﺵ ﺱ ﺯ ﺭ ﺫ ﺩ ﺥ ﺡ ﺝ ﺙ ﺕ ﺓ ﺏ ﺍ ﺉ ﺇ ﺅ ﺃ ﺁ ﺀ"
+    );
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn shapes_persian_letters() {
     let result = transform("فارسی");
 
