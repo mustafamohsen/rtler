@@ -9,6 +9,14 @@ fn shapes_and_reverses_a_pure_arabic_word() {
 }
 
 #[test]
+fn normalizes_existing_presentation_forms_before_transforming() {
+    let result = transform("سﻼم");
+
+    assert_eq!(result.output, "ﻡﻼﺳ");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn covers_common_arabic_letters_in_real_sentence() {
     let result = transform("هذا ليس من شأنك! اذهب في كتبك الآن! لنْ نَلين");
 
