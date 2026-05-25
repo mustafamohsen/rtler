@@ -251,9 +251,14 @@ fn right_joining(isolated: char, final_form: char) -> Forms {
 fn forms_for(ch: char) -> Option<Forms> {
     match ch {
         'ا' => Some(right_joining('ﺍ', 'ﺎ')),
+        'د' => Some(right_joining('ﺩ', 'ﺪ')),
+        'ر' => Some(right_joining('ﺭ', 'ﺮ')),
         'س' => Some(dual('ﺱ', 'ﺲ', 'ﺳ', 'ﺴ')),
+        'ف' => Some(dual('ﻑ', 'ﻒ', 'ﻓ', 'ﻔ')),
         'ل' => Some(dual('ﻝ', 'ﻞ', 'ﻟ', 'ﻠ')),
         'م' => Some(dual('ﻡ', 'ﻢ', 'ﻣ', 'ﻤ')),
+        'و' => Some(right_joining('ﻭ', 'ﻮ')),
+        'ی' => Some(dual('ﯼ', 'ﯽ', 'ﯾ', 'ﯿ')),
         _ => None,
     }
 }

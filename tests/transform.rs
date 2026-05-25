@@ -9,6 +9,22 @@ fn shapes_and_reverses_a_pure_arabic_word() {
 }
 
 #[test]
+fn shapes_persian_letters() {
+    let result = transform("فارسی");
+
+    assert_eq!(result.output, "ﯽﺳﺭﺎﻓ");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
+fn shapes_common_urdu_letters() {
+    let result = transform("اردو");
+
+    assert_eq!(result.output, "ﻭﺩﺭﺍ");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn keeps_basic_marks_attached_to_their_base_letters() {
     let result = transform("سَلَام");
 
