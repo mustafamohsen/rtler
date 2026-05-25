@@ -7,7 +7,11 @@
 ![macOS beta](https://img.shields.io/badge/macOS-beta-111827.svg)
 ![Arabic script](https://img.shields.io/badge/script-Arabic%20%7C%20Urdu%20%7C%20Persian-38BDF8.svg)
 
-[العربية](README.ar.md) · [اردو](README.ur.md)
+<p align="center">
+  <a href="README.md">English</a> ·
+  <a href="README.ar.md">العربية</a> ·
+  <a href="README.ur.md">اُردو</a>
+</p>
 
 RTLer converts Arabic-script text from normal logical Unicode into visual-order, pre-shaped compatibility text for apps that do not properly support right-to-left layout or Arabic shaping.
 

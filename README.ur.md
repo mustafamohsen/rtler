@@ -7,11 +7,15 @@
 ![macOS beta](https://img.shields.io/badge/macOS-beta-111827.svg)
 ![Arabic script](https://img.shields.io/badge/script-Arabic%20%7C%20Urdu%20%7C%20Persian-38BDF8.svg)
 
+<p align="center">
+  <a href="README.md">English</a> ·
+  <a href="README.ar.md">العربية</a> ·
+  <a href="README.ur.md">اُردو</a>
+</p>
+
 RTLer عربی رسم الخط کے متن کو عام منطقی Unicode ترتیب سے بصری ترتیب اور پہلے سے بنائی گئی compatibility شکلوں میں تبدیل کرتا ہے، تاکہ وہ ایپس میں درست نظر آئے جو دائیں سے بائیں متن یا عربی حروف کی shaping کو صحیح طور پر support نہیں کرتیں۔
 
 یہ ڈیزائن اور پبلشنگ workflows کے لیے مفید ہے، خاص طور پر جب عربی، اردو، یا فارسی متن target app میں paste کرنے کے بعد ٹوٹا ہوا، الٹا، یا غلط دکھائی دے۔
-
-[English](README.md) · [العربية](README.ar.md)
 
 ## یہ کیا کرتا ہے؟
 

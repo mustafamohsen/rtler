@@ -13,8 +13,16 @@ pub struct Warning {
     pub message: String,
 }
 
+/// Transforms a UTF-8 C string with RTLer.
+///
+/// Returns a newly allocated C string that must be freed with
+/// [`rtler_free_string`], or null if `input` is null or not valid UTF-8.
+///
+/// # Safety
+///
+/// `input` must either be null or point to a valid, NUL-terminated C string.
 #[unsafe(no_mangle)]
-pub extern "C" fn rtler_transform_text(input: *const c_char) -> *mut c_char {
+pub unsafe extern "C" fn rtler_transform_text(input: *const c_char) -> *mut c_char {
     if input.is_null() {
         return std::ptr::null_mut();
     }
@@ -30,8 +38,14 @@ pub extern "C" fn rtler_transform_text(input: *const c_char) -> *mut c_char {
     }
 }
 
+/// Frees a string returned by [`rtler_transform_text`].
+///
+/// # Safety
+///
+/// `ptr` must either be null or a pointer previously returned by
+/// [`rtler_transform_text`] that has not already been freed.
 #[unsafe(no_mangle)]
-pub extern "C" fn rtler_free_string(ptr: *mut c_char) {
+pub unsafe extern "C" fn rtler_free_string(ptr: *mut c_char) {
     if ptr.is_null() {
         return;
     }
@@ -190,14 +204,16 @@ fn collect_letters(input: &str) -> Vec<ArabicLetter> {
     let mut letters = Vec::new();
     let mut index = 0;
     while index < raw.len() {
-        if raw[index].base == 'ل' && index + 1 < raw.len() {
-            if let Some(lam_alef) = LamAlef::for_alef(raw[index + 1].base) {
-                let mut marks = raw[index].marks.clone();
-                marks.extend(raw[index + 1].marks.iter().copied());
-                letters.push(ArabicLetter::lam_alef('ل', lam_alef, marks));
-                index += 2;
-                continue;
-            }
+        let lam_alef = (raw[index].base == 'ل' && index + 1 < raw.len())
+            .then(|| LamAlef::for_alef(raw[index + 1].base))
+            .flatten();
+
+        if let Some(lam_alef) = lam_alef {
+            let mut marks = raw[index].marks.clone();
+            marks.extend(raw[index + 1].marks.iter().copied());
+            letters.push(ArabicLetter::lam_alef('ل', lam_alef, marks));
+            index += 2;
+            continue;
         }
 
         letters.push(raw[index].clone());

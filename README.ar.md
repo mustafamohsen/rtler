@@ -7,11 +7,15 @@
 ![macOS beta](https://img.shields.io/badge/macOS-beta-111827.svg)
 ![Arabic script](https://img.shields.io/badge/script-Arabic%20%7C%20Urdu%20%7C%20Persian-38BDF8.svg)
 
+<p align="center">
+  <a href="README.md">English</a> ·
+  <a href="README.ar.md">العربية</a> ·
+  <a href="README.ur.md">اُردو</a>
+</p>
+
 RTLer يحوّل النصوص العربية وما يشابهها من ترتيب Unicode المنطقي العادي إلى نص بصري مُشكّل مسبقًا، مناسب للتطبيقات التي لا تدعم اتجاه الكتابة من اليمين إلى اليسار أو تشكيل الحروف العربية بشكل صحيح.
 
 يفيد RTLer في workflows التصميم والنشر عندما تظهر النصوص العربية أو الأردية أو الفارسية مفككة، أو معكوسة، أو غير صحيحة بعد لصقها في التطبيق الهدف.
-
-[English](README.md) · [اردو](README.ur.md)
 
 ## ماذا يفعل؟
 
