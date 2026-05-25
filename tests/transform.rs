@@ -100,6 +100,22 @@ fn shapes_common_urdu_letters() {
 }
 
 #[test]
+fn shapes_common_urdu_sentences_without_warnings() {
+    let cases = [
+        "یہ ایک اردو جملہ ہے",
+        "میں نے کتاب پڑھی",
+        "آپ کیسے ہیں؟",
+        "پاکستان میں اردو بولی جاتی ہے۔",
+        "بھ پھ تھ ٹھ جھ چھ دھ ڈھ کھ گھ",
+    ];
+
+    for input in cases {
+        let result = transform(input);
+        assert!(result.warnings.is_empty(), "input: {input}; warnings: {:?}", result.warnings);
+    }
+}
+
+#[test]
 fn passes_through_unsupported_arabic_script_characters_with_warning() {
     let result = transform("سݨ");
 
