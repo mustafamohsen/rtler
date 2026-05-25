@@ -11,21 +11,22 @@ pub struct Warning {
 }
 
 pub fn transform(input: &str) -> TransformResult {
-    let shaped: Vec<char> = shape(input);
+    let shaped = shape(input);
     TransformResult {
-        output: shaped.into_iter().rev().collect(),
+        output: shaped.into_iter().rev().collect::<String>(),
         warnings: Vec::new(),
     }
 }
 
-fn shape(input: &str) -> Vec<char> {
+fn shape(input: &str) -> Vec<String> {
     let letters = collect_letters(input);
 
     letters
         .iter()
         .enumerate()
         .map(|(index, letter)| {
-            if let Some(ligature) = letter.lam_alef {
+            let mut cluster = String::new();
+            let shaped = if let Some(ligature) = letter.lam_alef {
                 let previous_joins_to_current = index > 0
                     && letters[index - 1].can_connect_to_left()
                     && letter.can_connect_to_right();
@@ -50,64 +51,87 @@ fn shape(input: &str) -> Vec<char> {
                 }
             } else {
                 letter.base
-            }
+            };
+
+            cluster.push(shaped);
+            cluster.extend(letter.marks.iter());
+            cluster
         })
         .collect()
 }
 
 fn collect_letters(input: &str) -> Vec<ArabicLetter> {
     let chars: Vec<char> = input.chars().collect();
-    let mut letters = Vec::new();
+    let mut raw = Vec::new();
     let mut index = 0;
 
     while index < chars.len() {
-        if chars[index] == 'ل' && index + 1 < chars.len() {
-            if let Some(lam_alef) = LamAlef::for_alef(chars[index + 1]) {
-                letters.push(ArabicLetter::lam_alef(chars[index], lam_alef));
+        let base = chars[index];
+        index += 1;
+        let mut marks = Vec::new();
+        while index < chars.len() && is_basic_arabic_mark(chars[index]) {
+            marks.push(chars[index]);
+            index += 1;
+        }
+        raw.push(ArabicLetter::from_with_marks(base, marks));
+    }
+
+    let mut letters = Vec::new();
+    let mut index = 0;
+    while index < raw.len() {
+        if raw[index].base == 'ل' && index + 1 < raw.len() {
+            if let Some(lam_alef) = LamAlef::for_alef(raw[index + 1].base) {
+                let mut marks = raw[index].marks.clone();
+                marks.extend(raw[index + 1].marks.iter().copied());
+                letters.push(ArabicLetter::lam_alef('ل', lam_alef, marks));
                 index += 2;
                 continue;
             }
-
-            letters.push(ArabicLetter::from(chars[index]));
-            index += 1;
-        } else {
-            letters.push(ArabicLetter::from(chars[index]));
-            index += 1;
         }
+
+        letters.push(raw[index].clone());
+        index += 1;
     }
 
     letters
 }
 
-#[derive(Debug, Clone, Copy)]
+fn is_basic_arabic_mark(ch: char) -> bool {
+    matches!(ch, '\u{064B}'..='\u{065F}' | '\u{0670}')
+}
+
+#[derive(Debug, Clone)]
 struct ArabicLetter {
     base: char,
+    marks: Vec<char>,
     forms: Option<Forms>,
     lam_alef: Option<LamAlef>,
 }
 
 impl ArabicLetter {
-    fn from(base: char) -> Self {
+    fn from_with_marks(base: char, marks: Vec<char>) -> Self {
         Self {
             base,
+            marks,
             forms: forms_for(base),
             lam_alef: None,
         }
     }
 
-    fn lam_alef(base: char, lam_alef: LamAlef) -> Self {
+    fn lam_alef(base: char, lam_alef: LamAlef, marks: Vec<char>) -> Self {
         Self {
             base,
+            marks,
             forms: None,
             lam_alef: Some(lam_alef),
         }
     }
 
-    fn can_connect_to_right(self) -> bool {
+    fn can_connect_to_right(&self) -> bool {
         self.forms.is_some() || self.lam_alef.is_some()
     }
 
-    fn can_connect_to_left(self) -> bool {
+    fn can_connect_to_left(&self) -> bool {
         self.forms
             .is_some_and(|forms| forms.initial.is_some() && forms.medial.is_some())
     }
