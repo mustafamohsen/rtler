@@ -28,6 +28,14 @@ public protocol PermissionChecking {
     func canControlComputer() -> Bool
 }
 
+public protocol FrontmostApplicationProvider {
+    func frontmostApplication() -> NSRunningApplication?
+}
+
+public protocol ApplicationActivating {
+    func activate(_ application: NSRunningApplication)
+}
+
 public struct RtlerTextTransformer: TextTransformer {
     public init() {}
 
@@ -41,6 +49,22 @@ public struct AccessibilityPermissionChecker: PermissionChecking {
 
     public func canControlComputer() -> Bool {
         AXIsProcessTrusted()
+    }
+}
+
+public struct WorkspaceFrontmostApplicationProvider: FrontmostApplicationProvider {
+    public init() {}
+
+    public func frontmostApplication() -> NSRunningApplication? {
+        NSWorkspace.shared.frontmostApplication
+    }
+}
+
+public struct RunningApplicationActivator: ApplicationActivating {
+    public init() {}
+
+    public func activate(_ application: NSRunningApplication) {
+        application.activate(options: [.activateIgnoringOtherApps])
     }
 }
 
@@ -99,6 +123,8 @@ public final class SelectionReplacementService {
     private let keyboard: KeyboardEventSender
     private let transformer: TextTransformer
     private let permissions: PermissionChecking
+    private let frontmostApplicationProvider: FrontmostApplicationProvider
+    private let applicationActivator: ApplicationActivating
     private let sleep: (TimeInterval) -> Void
 
     public init(
@@ -106,12 +132,16 @@ public final class SelectionReplacementService {
         keyboard: KeyboardEventSender = SystemKeyboardEventSender(),
         transformer: TextTransformer = RtlerTextTransformer(),
         permissions: PermissionChecking = AccessibilityPermissionChecker(),
+        frontmostApplicationProvider: FrontmostApplicationProvider = WorkspaceFrontmostApplicationProvider(),
+        applicationActivator: ApplicationActivating = RunningApplicationActivator(),
         sleep: @escaping (TimeInterval) -> Void = { Thread.sleep(forTimeInterval: $0) }
     ) {
         self.clipboard = clipboard
         self.keyboard = keyboard
         self.transformer = transformer
         self.permissions = permissions
+        self.frontmostApplicationProvider = frontmostApplicationProvider
+        self.applicationActivator = applicationActivator
         self.sleep = sleep
     }
 
@@ -120,9 +150,11 @@ public final class SelectionReplacementService {
             throw ReplacementError.accessibilityPermissionRequired
         }
 
+        let sourceApplication = frontmostApplicationProvider.frontmostApplication()
         let originalClipboard = clipboard.snapshot()
+        let preCopyChangeCount = clipboard.changeCount()
         keyboard.copy()
-        sleep(0.12)
+        waitForPasteboardChange(after: preCopyChangeCount, timeout: 0.50)
 
         guard let selectedText = clipboard.string(), !selectedText.isEmpty else {
             clipboard.restore(originalClipboard)
@@ -135,8 +167,22 @@ public final class SelectionReplacementService {
         }
 
         clipboard.setString(transformed)
+        if let sourceApplication {
+            applicationActivator.activate(sourceApplication)
+            sleep(0.05)
+        }
         keyboard.paste()
-        sleep(0.20)
+        sleep(0.50)
         clipboard.restore(originalClipboard)
+    }
+
+    private func waitForPasteboardChange(after initialChangeCount: Int, timeout: TimeInterval) {
+        let deadline = Date().addingTimeInterval(timeout)
+        repeat {
+            if clipboard.changeCount() != initialChangeCount {
+                return
+            }
+            sleep(0.02)
+        } while Date() < deadline
     }
 }

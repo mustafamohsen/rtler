@@ -11,6 +11,8 @@ final class SelectionReplacementServiceTests: XCTestCase {
             keyboard: keyboard,
             transformer: FakeTransformer(output: "ﻡﻼﺳ"),
             permissions: FakePermissions(allowed: true),
+            frontmostApplicationProvider: FakeFrontmostApplicationProvider(),
+            applicationActivator: FakeApplicationActivator(),
             sleep: { _ in }
         )
 
@@ -29,6 +31,8 @@ final class SelectionReplacementServiceTests: XCTestCase {
             keyboard: keyboard,
             transformer: FakeTransformer(output: "unused"),
             permissions: FakePermissions(allowed: true),
+            frontmostApplicationProvider: FakeFrontmostApplicationProvider(),
+            applicationActivator: FakeApplicationActivator(),
             sleep: { _ in }
         )
 
@@ -47,6 +51,8 @@ final class SelectionReplacementServiceTests: XCTestCase {
             keyboard: keyboard,
             transformer: FakeTransformer(output: "ﻡﻼﺳ"),
             permissions: FakePermissions(allowed: false),
+            frontmostApplicationProvider: FakeFrontmostApplicationProvider(),
+            applicationActivator: FakeApplicationActivator(),
             sleep: { _ in }
         )
 
@@ -118,4 +124,14 @@ private struct FakePermissions: PermissionChecking {
     func canControlComputer() -> Bool {
         allowed
     }
+}
+
+private struct FakeFrontmostApplicationProvider: FrontmostApplicationProvider {
+    func frontmostApplication() -> NSRunningApplication? {
+        nil
+    }
+}
+
+private struct FakeApplicationActivator: ApplicationActivating {
+    func activate(_ application: NSRunningApplication) {}
 }

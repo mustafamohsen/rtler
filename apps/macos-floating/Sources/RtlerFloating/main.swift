@@ -41,13 +41,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func convertSelection() {
+        NSLog("RTLER floating button clicked")
         do {
             try service.replaceSelection()
+            NSLog("RTLER replacement succeeded")
             flash(color: .systemGreen)
         } catch ReplacementError.accessibilityPermissionRequired {
+            NSLog("RTLER replacement failed: Accessibility permission required")
             promptForAccessibilityPermission()
             flash(color: .systemOrange)
         } catch {
+            NSLog("RTLER replacement failed: \(String(describing: error))")
             flash(color: .systemRed)
         }
     }
