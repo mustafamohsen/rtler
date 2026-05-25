@@ -135,6 +135,7 @@ public final class SelectionReplacementService {
     private let permissions: PermissionChecking
     private let frontmostApplicationProvider: FrontmostApplicationProvider
     private let applicationActivator: ApplicationActivating
+    private let pasteRestoreDelay: TimeInterval
     private let sleep: (TimeInterval) -> Void
 
     public init(
@@ -144,6 +145,7 @@ public final class SelectionReplacementService {
         permissions: PermissionChecking = AccessibilityPermissionChecker(),
         frontmostApplicationProvider: FrontmostApplicationProvider = WorkspaceFrontmostApplicationProvider(),
         applicationActivator: ApplicationActivating = RunningApplicationActivator(),
+        pasteRestoreDelay: TimeInterval = SelectionReplacementService.defaultPasteRestoreDelay(),
         sleep: @escaping (TimeInterval) -> Void = { Thread.sleep(forTimeInterval: $0) }
     ) {
         self.clipboard = clipboard
@@ -152,6 +154,7 @@ public final class SelectionReplacementService {
         self.permissions = permissions
         self.frontmostApplicationProvider = frontmostApplicationProvider
         self.applicationActivator = applicationActivator
+        self.pasteRestoreDelay = pasteRestoreDelay
         self.sleep = sleep
     }
 
@@ -194,9 +197,19 @@ public final class SelectionReplacementService {
         }
         NSLog("RTLER service: sending paste")
         keyboard.paste()
-        sleep(0.50)
+        NSLog("RTLER service: waiting \(pasteRestoreDelay)s before restoring clipboard")
+        sleep(pasteRestoreDelay)
         NSLog("RTLER service: restoring clipboard")
         clipboard.restore(originalClipboard)
+    }
+
+    public static func defaultPasteRestoreDelay() -> TimeInterval {
+        guard let value = ProcessInfo.processInfo.environment["RTLER_PASTE_RESTORE_DELAY"],
+              let delay = TimeInterval(value),
+              delay >= 0 else {
+            return 2.0
+        }
+        return delay
     }
 
     private func waitForPasteboardChange(after initialChangeCount: Int, timeout: TimeInterval) {

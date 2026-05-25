@@ -13,6 +13,7 @@ final class SelectionReplacementServiceTests: XCTestCase {
             permissions: FakePermissions(allowed: true),
             frontmostApplicationProvider: FakeFrontmostApplicationProvider(),
             applicationActivator: FakeApplicationActivator(),
+            pasteRestoreDelay: 0,
             sleep: { _ in }
         )
 
@@ -33,6 +34,7 @@ final class SelectionReplacementServiceTests: XCTestCase {
             permissions: FakePermissions(allowed: true),
             frontmostApplicationProvider: FakeFrontmostApplicationProvider(),
             applicationActivator: FakeApplicationActivator(),
+            pasteRestoreDelay: 0,
             sleep: { _ in }
         )
 
@@ -53,6 +55,7 @@ final class SelectionReplacementServiceTests: XCTestCase {
             permissions: FakePermissions(allowed: false),
             frontmostApplicationProvider: FakeFrontmostApplicationProvider(),
             applicationActivator: FakeApplicationActivator(),
+            pasteRestoreDelay: 0,
             sleep: { _ in }
         )
 
