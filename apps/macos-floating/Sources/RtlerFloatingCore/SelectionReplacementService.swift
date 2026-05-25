@@ -7,9 +7,17 @@ public enum ReplacementError: Error, Equatable {
     case transformFailed
 }
 
+public struct ClipboardSnapshot: Equatable {
+    public let string: String?
+
+    public init(string: String?) {
+        self.string = string
+    }
+}
+
 public protocol ClipboardStore {
-    func snapshot() -> [NSPasteboardItem]
-    func restore(_ snapshot: [NSPasteboardItem])
+    func snapshot() -> ClipboardSnapshot
+    func restore(_ snapshot: ClipboardSnapshot)
     func string() -> String?
     func setString(_ string: String)
     func changeCount() -> Int
@@ -73,13 +81,15 @@ public final class GeneralPasteboardStore: ClipboardStore {
 
     public init() {}
 
-    public func snapshot() -> [NSPasteboardItem] {
-        pasteboard.pasteboardItems?.compactMap { $0.copy() as? NSPasteboardItem } ?? []
+    public func snapshot() -> ClipboardSnapshot {
+        ClipboardSnapshot(string: pasteboard.string(forType: .string))
     }
 
-    public func restore(_ snapshot: [NSPasteboardItem]) {
+    public func restore(_ snapshot: ClipboardSnapshot) {
         pasteboard.clearContents()
-        pasteboard.writeObjects(snapshot)
+        if let string = snapshot.string {
+            pasteboard.setString(string, forType: .string)
+        }
     }
 
     public func string() -> String? {
@@ -150,29 +160,42 @@ public final class SelectionReplacementService {
             throw ReplacementError.accessibilityPermissionRequired
         }
 
+        NSLog("RTLER service: checking frontmost app")
         let sourceApplication = frontmostApplicationProvider.frontmostApplication()
+        NSLog("RTLER service: source app = \(sourceApplication?.localizedName ?? "unknown")")
+
+        NSLog("RTLER service: snapshotting plain-text clipboard")
         let originalClipboard = clipboard.snapshot()
+
         let preCopyChangeCount = clipboard.changeCount()
+        NSLog("RTLER service: sending copy")
         keyboard.copy()
         waitForPasteboardChange(after: preCopyChangeCount, timeout: 0.50)
 
         guard let selectedText = clipboard.string(), !selectedText.isEmpty else {
+            NSLog("RTLER service: no selected text found")
             clipboard.restore(originalClipboard)
             throw ReplacementError.noSelectedText
         }
+        NSLog("RTLER service: copied \(selectedText.count) characters")
 
         guard let transformed = transformer.transform(selectedText) else {
+            NSLog("RTLER service: transform failed")
             clipboard.restore(originalClipboard)
             throw ReplacementError.transformFailed
         }
+        NSLog("RTLER service: transformed text to \(transformed.count) characters")
 
         clipboard.setString(transformed)
         if let sourceApplication {
+            NSLog("RTLER service: reactivating source app")
             applicationActivator.activate(sourceApplication)
             sleep(0.05)
         }
+        NSLog("RTLER service: sending paste")
         keyboard.paste()
         sleep(0.50)
+        NSLog("RTLER service: restoring clipboard")
         clipboard.restore(originalClipboard)
     }
 

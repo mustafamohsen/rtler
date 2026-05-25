@@ -66,22 +66,20 @@ final class SelectionReplacementServiceTests: XCTestCase {
 
 private final class FakeClipboard: ClipboardStore {
     private let selectedTextAfterCopy: String?
-    private let originalItem = NSPasteboardItem()
     var currentText: String?
     var pastedText: String?
 
     init(selectedTextAfterCopy: String?, originalText: String) {
         self.selectedTextAfterCopy = selectedTextAfterCopy
         self.currentText = originalText
-        originalItem.setString(originalText, forType: .string)
     }
 
-    func snapshot() -> [NSPasteboardItem] {
-        [originalItem]
+    func snapshot() -> ClipboardSnapshot {
+        ClipboardSnapshot(string: currentText)
     }
 
-    func restore(_ snapshot: [NSPasteboardItem]) {
-        currentText = snapshot.first?.string(forType: .string)
+    func restore(_ snapshot: ClipboardSnapshot) {
+        currentText = snapshot.string
     }
 
     func string() -> String? {
