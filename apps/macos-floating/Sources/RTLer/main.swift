@@ -35,9 +35,9 @@ private final class FloatingButtonView: NSView {
         wantsLayer = true
         layer?.masksToBounds = false
         layer?.shadowColor = NSColor.black.cgColor
-        layer?.shadowOpacity = 0.28
-        layer?.shadowRadius = 18
-        layer?.shadowOffset = NSSize(width: 0, height: -8)
+        layer?.shadowOpacity = 0.20
+        layer?.shadowRadius = 10
+        layer?.shadowOffset = NSSize(width: 0, height: -4)
 
         backgroundLayer.colors = [cgColor(idleTopColor), cgColor(idleBottomColor)]
         backgroundLayer.startPoint = CGPoint(x: 0.18, y: 0.08)
@@ -63,7 +63,7 @@ private final class FloatingButtonView: NSView {
 
         directionLayer.fillColor = NSColor.clear.cgColor
         directionLayer.strokeColor = cgColor(accentColor)
-        directionLayer.lineWidth = 3.1
+        directionLayer.lineWidth = 2.1
         directionLayer.lineCap = .round
         directionLayer.lineJoin = .round
         layer?.addSublayer(directionLayer)
@@ -71,7 +71,7 @@ private final class FloatingButtonView: NSView {
         feedbackLabel.translatesAutoresizingMaskIntoConstraints = false
         feedbackLabel.alphaValue = 0
         feedbackLabel.textColor = .white
-        feedbackLabel.font = .systemFont(ofSize: 21, weight: .semibold)
+        feedbackLabel.font = .systemFont(ofSize: 17, weight: .semibold)
         feedbackLabel.alignment = .center
         addSubview(feedbackLabel)
 
@@ -84,7 +84,7 @@ private final class FloatingButtonView: NSView {
     override func layout() {
         super.layout()
         let buttonFrame = bounds.insetBy(dx: 1, dy: 1)
-        let cornerRadius = min(buttonFrame.width, buttonFrame.height) * 0.34
+        let cornerRadius = min(buttonFrame.width, buttonFrame.height) * 0.30
 
         backgroundLayer.frame = buttonFrame
         backgroundLayer.cornerRadius = cornerRadius
@@ -104,17 +104,18 @@ private final class FloatingButtonView: NSView {
             transform: nil
         )
 
-        topLineLayer.path = linePath(from: CGPoint(x: buttonFrame.minX + 20, y: buttonFrame.minY + 21),
-                                     to: CGPoint(x: buttonFrame.maxX - 13, y: buttonFrame.minY + 21))
-        middleLineLayer.path = linePath(from: CGPoint(x: buttonFrame.minX + 27, y: buttonFrame.minY + 29),
-                                        to: CGPoint(x: buttonFrame.maxX - 13, y: buttonFrame.minY + 29))
-        bottomLineLayer.path = linePath(from: CGPoint(x: buttonFrame.minX + 23, y: buttonFrame.minY + 37),
-                                        to: CGPoint(x: buttonFrame.maxX - 13, y: buttonFrame.minY + 37))
+        let glyphFrame = buttonFrame.insetBy(dx: 9.5, dy: 9.5)
+        topLineLayer.path = linePath(from: glyphPoint(x: 32, y: 42, in: glyphFrame),
+                                     to: glyphPoint(x: 93, y: 42, in: glyphFrame))
+        middleLineLayer.path = linePath(from: glyphPoint(x: 52, y: 64, in: glyphFrame),
+                                        to: glyphPoint(x: 93, y: 64, in: glyphFrame))
+        bottomLineLayer.path = linePath(from: glyphPoint(x: 43, y: 86, in: glyphFrame),
+                                        to: glyphPoint(x: 93, y: 86, in: glyphFrame))
 
         let directionPath = CGMutablePath()
-        directionPath.move(to: CGPoint(x: buttonFrame.minX + 20.5, y: buttonFrame.minY + 24.5))
-        directionPath.addLine(to: CGPoint(x: buttonFrame.minX + 14.5, y: buttonFrame.minY + 29))
-        directionPath.addLine(to: CGPoint(x: buttonFrame.minX + 20.5, y: buttonFrame.minY + 33.5))
+        directionPath.move(to: glyphPoint(x: 39, y: 53, in: glyphFrame))
+        directionPath.addLine(to: glyphPoint(x: 28, y: 64, in: glyphFrame))
+        directionPath.addLine(to: glyphPoint(x: 39, y: 75, in: glyphFrame))
         directionLayer.path = directionPath
     }
 
@@ -162,7 +163,7 @@ private final class FloatingButtonView: NSView {
     private func configureGlyphLine(_ layer: CAShapeLayer, alpha: CGFloat) {
         layer.fillColor = NSColor.clear.cgColor
         layer.strokeColor = NSColor.white.withAlphaComponent(alpha).cgColor
-        layer.lineWidth = 4.2
+        layer.lineWidth = 2.6
         layer.lineCap = .round
     }
 
@@ -171,6 +172,13 @@ private final class FloatingButtonView: NSView {
         path.move(to: start)
         path.addLine(to: end)
         return path
+    }
+
+    private func glyphPoint(x: CGFloat, y: CGFloat, in rect: CGRect) -> CGPoint {
+        CGPoint(
+            x: rect.minX + (x / 128) * rect.width,
+            y: rect.minY + ((128 - y) / 128) * rect.height
+        )
     }
 
     private func animatePress(isPressed: Bool) {
@@ -267,8 +275,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func createFloatingButton() {
-        let buttonSize = NSSize(width: 56, height: 56)
-        let panelSize = NSSize(width: 80, height: 80)
+        let buttonSize = NSSize(width: 44, height: 44)
+        let panelSize = NSSize(width: 54, height: 54)
         panel = NSPanel(
             contentRect: NSRect(origin: restoredPanelOrigin(panelSize: panelSize), size: panelSize),
             styleMask: [.borderless, .nonactivatingPanel],
@@ -281,6 +289,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         panel.isMovableByWindowBackground = false
         panel.backgroundColor = .clear
         panel.isOpaque = false
+        panel.hasShadow = false
 
         buttonView = FloatingButtonView(
             frame: NSRect(
