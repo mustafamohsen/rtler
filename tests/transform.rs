@@ -138,6 +138,17 @@ fn preserves_ascii_word_runs_in_mixed_arabic_text() {
 }
 
 #[test]
+fn preserves_urls_and_emails_in_mixed_arabic_text() {
+    let result = transform("زر https://example.com أو راسل test@example.com الآن");
+
+    assert_eq!(
+        result.output,
+        "ﻥﻵﺍ test@example.com ﻞﺳﺍﺭ ﻭﺃ https://example.com ﺭﺯ"
+    );
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn preserves_common_numeric_runs_in_arabic_text() {
     let result = transform("السعر ١٢٫٥٠ والخصم 50% في 2026/05/25");
 
