@@ -4,7 +4,9 @@ fn main() -> io::Result<()> {
     let arg = std::env::args().nth(1);
 
     if matches!(arg.as_deref(), Some("--help") | Some("-h")) {
-        println!("Usage: rtler [TEXT]\n\nTransform Arabic-script text for non-RTL/non-shaping environments.\n\nIf TEXT is omitted, rtler reads stdin and writes transformed text to stdout.");
+        println!(
+            "Usage: rtler [TEXT]\n\nTransform Arabic-script text for non-RTL/non-shaping environments.\n\nIf TEXT is omitted, rtler reads stdin and writes transformed text to stdout."
+        );
         return Ok(());
     }
 

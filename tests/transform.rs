@@ -26,7 +26,10 @@ fn matches_mixed_arabic_smoke_fixture() {
 fn matches_urdu_smoke_fixture() {
     let result = transform(include_str!("../fixtures/urdu-smoke-input.txt"));
 
-    assert_eq!(result.output, include_str!("../fixtures/urdu-smoke-expected.txt"));
+    assert_eq!(
+        result.output,
+        include_str!("../fixtures/urdu-smoke-expected.txt")
+    );
     assert!(result.warnings.is_empty());
 }
 
@@ -122,7 +125,11 @@ fn shapes_common_persian_sentences_without_warnings() {
 
     for input in cases {
         let result = transform(input);
-        assert!(result.warnings.is_empty(), "input: {input}; warnings: {:?}", result.warnings);
+        assert!(
+            result.warnings.is_empty(),
+            "input: {input}; warnings: {:?}",
+            result.warnings
+        );
     }
 }
 
@@ -146,7 +153,11 @@ fn shapes_common_urdu_sentences_without_warnings() {
 
     for input in cases {
         let result = transform(input);
-        assert!(result.warnings.is_empty(), "input: {input}; warnings: {:?}", result.warnings);
+        assert!(
+            result.warnings.is_empty(),
+            "input: {input}; warnings: {:?}",
+            result.warnings
+        );
     }
 }
 
