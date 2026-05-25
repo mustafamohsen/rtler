@@ -3,6 +3,7 @@ import RtlerFloatingCore
 
 private final class FloatingButtonView: NSView {
     var onClick: (() -> Void)?
+    var onDragEnd: (() -> Void)?
 
     private let label = NSTextField(labelWithString: "RTL")
     private var mouseDownScreenLocation: NSPoint?
@@ -67,7 +68,9 @@ private final class FloatingButtonView: NSView {
     }
 
     override func mouseUp(with event: NSEvent) {
-        if !didDrag {
+        if didDrag {
+            onDragEnd?()
+        } else {
             onClick?()
         }
         mouseDownScreenLocation = nil
@@ -110,12 +113,17 @@ private final class FloatingButtonView: NSView {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private static let savedPanelOriginKey = "RtlerFloating.panelOrigin"
+    private static let defaultPanelOrigin = NSPoint(x: 80, y: 500)
+
     private var panel: NSPanel!
     private var buttonView: FloatingButtonView!
+    private var statusItem: NSStatusItem!
     private let service = SelectionReplacementService()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        createStatusMenu()
         createFloatingButton()
     }
 
@@ -123,7 +131,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let buttonSize = NSSize(width: 56, height: 56)
         let panelSize = NSSize(width: 80, height: 80)
         panel = NSPanel(
-            contentRect: NSRect(origin: NSPoint(x: 80, y: 500), size: panelSize),
+            contentRect: NSRect(origin: restoredPanelOrigin(panelSize: panelSize), size: panelSize),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -145,6 +153,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         buttonView.onClick = { [weak self] in
             self?.convertSelection()
+        }
+        buttonView.onDragEnd = { [weak self] in
+            self?.savePanelOrigin()
         }
 
         panel.contentView = buttonView
@@ -173,9 +184,73 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    private func createStatusMenu() {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        statusItem.button?.title = "RTL"
+
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: "Show Floating Button", action: #selector(showFloatingButton), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Hide Floating Button", action: #selector(hideFloatingButton), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Reset Button Position", action: #selector(resetButtonPosition), keyEquivalent: ""))
+        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Open Accessibility Settings", action: #selector(openAccessibilitySettings), keyEquivalent: ""))
+        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Quit RTLER", action: #selector(quit), keyEquivalent: "q"))
+        statusItem.menu = menu
+    }
+
+    @objc private func showFloatingButton() {
+        panel.orderFrontRegardless()
+    }
+
+    @objc private func hideFloatingButton() {
+        panel.orderOut(nil)
+    }
+
+    @objc private func resetButtonPosition() {
+        panel.setFrameOrigin(Self.defaultPanelOrigin)
+        savePanelOrigin()
+        panel.orderFrontRegardless()
+    }
+
+    @objc private func openAccessibilitySettings() {
+        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+        NSWorkspace.shared.open(url)
+    }
+
+    @objc private func quit() {
+        NSApp.terminate(nil)
+    }
+
+    private func savePanelOrigin() {
+        let origin = panel.frame.origin
+        UserDefaults.standard.set(["x": origin.x, "y": origin.y], forKey: Self.savedPanelOriginKey)
+    }
+
+    private func restoredPanelOrigin(panelSize: NSSize) -> NSPoint {
+        guard let stored = UserDefaults.standard.dictionary(forKey: Self.savedPanelOriginKey),
+              let x = stored["x"] as? CGFloat,
+              let y = stored["y"] as? CGFloat else {
+            return Self.defaultPanelOrigin
+        }
+        return clampedPanelOrigin(NSPoint(x: x, y: y), panelSize: panelSize)
+    }
+
+    private func clampedPanelOrigin(_ origin: NSPoint, panelSize: NSSize) -> NSPoint {
+        let screenFrame = NSScreen.screens.first { $0.visibleFrame.contains(origin) }?.visibleFrame
+            ?? NSScreen.main?.visibleFrame
+            ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+
+        return NSPoint(
+            x: min(max(origin.x, screenFrame.minX), screenFrame.maxX - panelSize.width),
+            y: min(max(origin.y, screenFrame.minY), screenFrame.maxY - panelSize.height)
+        )
+    }
+
     private func promptForAccessibilityPermission() {
         let options = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
+        openAccessibilitySettings()
     }
 }
 
