@@ -54,7 +54,7 @@ fn shape(input: &str) -> Vec<String> {
                     (false, false) => forms.isolated,
                 }
             } else {
-                letter.base
+                mirrored_bracket(letter.base).unwrap_or(letter.base)
             };
 
             cluster.push(shaped);
@@ -116,6 +116,20 @@ fn is_basic_arabic_mark(ch: char) -> bool {
 
 fn is_digit(ch: char) -> bool {
     ch.is_ascii_digit() || matches!(ch, '\u{0660}'..='\u{0669}' | '\u{06F0}'..='\u{06F9}')
+}
+
+fn mirrored_bracket(ch: char) -> Option<char> {
+    match ch {
+        '(' => Some(')'),
+        ')' => Some('('),
+        '[' => Some(']'),
+        ']' => Some('['),
+        '{' => Some('}'),
+        '}' => Some('{'),
+        '<' => Some('>'),
+        '>' => Some('<'),
+        _ => None,
+    }
 }
 
 #[derive(Debug, Clone)]

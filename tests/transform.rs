@@ -25,6 +25,14 @@ fn preserves_digit_runs_in_left_to_right_order() {
 }
 
 #[test]
+fn mirrors_paired_brackets_when_reordering() {
+    let result = transform("(سلام)");
+
+    assert_eq!(result.output, "(ﻡﻼﺳ)");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn emits_lam_alef_ligatures_for_common_alef_variants() {
     assert_eq!(transform("لا").output, "ﻻ");
     assert_eq!(transform("لأ").output, "ﻷ");
