@@ -33,6 +33,14 @@ fn mirrors_paired_brackets_when_reordering() {
 }
 
 #[test]
+fn transforms_each_explicit_line_independently() {
+    let result = transform("سلام\nسم");
+
+    assert_eq!(result.output, "ﻡﻼﺳ\nﻢﺳ");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn emits_lam_alef_ligatures_for_common_alef_variants() {
     assert_eq!(transform("لا").output, "ﻻ");
     assert_eq!(transform("لأ").output, "ﻷ");

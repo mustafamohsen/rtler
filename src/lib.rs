@@ -11,11 +11,21 @@ pub struct Warning {
 }
 
 pub fn transform(input: &str) -> TransformResult {
-    let shaped = shape(input);
+    let output = input
+        .split('\n')
+        .map(transform_line)
+        .collect::<Vec<_>>()
+        .join("\n");
+
     TransformResult {
-        output: shaped.into_iter().rev().collect::<String>(),
+        output,
         warnings: Vec::new(),
     }
+}
+
+fn transform_line(input: &str) -> String {
+    let shaped = shape(input);
+    shaped.into_iter().rev().collect::<String>()
 }
 
 fn shape(input: &str) -> Vec<String> {
