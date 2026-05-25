@@ -116,7 +116,8 @@ fn shape(input: &str, warnings: &mut Vec<Warning>) -> Vec<String> {
                 if is_unsupported_arabic_script_letter(letter.base) {
                     warnings.push(Warning {
                         character: letter.base,
-                        message: "no presentation-form mapping; passed through unchanged".to_string(),
+                        message: "no presentation-form mapping; passed through unchanged"
+                            .to_string(),
                     });
                 }
                 mirrored_bracket(letter.base).unwrap_or(letter.base)
@@ -184,7 +185,11 @@ fn is_digit(ch: char) -> bool {
 }
 
 fn is_numeric_run_char(ch: char) -> bool {
-    is_digit(ch) || matches!(ch, '.' | ',' | '/' | ':' | '%' | '\u{066B}' | '\u{066C}' | '\u{066A}')
+    is_digit(ch)
+        || matches!(
+            ch,
+            '.' | ',' | '/' | ':' | '%' | '\u{066B}' | '\u{066C}' | '\u{066A}'
+        )
 }
 
 fn is_unsupported_arabic_script_letter(ch: char) -> bool {

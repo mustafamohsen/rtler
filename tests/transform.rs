@@ -4,7 +4,10 @@ use rtler::transform;
 fn matches_arabic_smoke_fixture() {
     let result = transform(include_str!("../fixtures/arabic-smoke-input.txt"));
 
-    assert_eq!(result.output, include_str!("../fixtures/arabic-smoke-expected.txt"));
+    assert_eq!(
+        result.output,
+        include_str!("../fixtures/arabic-smoke-expected.txt")
+    );
     assert!(result.warnings.is_empty());
 }
 
@@ -28,10 +31,7 @@ fn normalizes_existing_presentation_forms_before_transforming() {
 fn covers_common_arabic_letters_in_real_sentence() {
     let result = transform("هذا ليس من شأنك! اذهب في كتبك الآن! لنْ نَلين");
 
-    assert_eq!(
-        result.output,
-        "ﻦﻴﻠﻧَ ﻦْﻟ !ﻥﻵﺍ ﻚﺒﺘﻛ ﻲﻓ ﺐﻫﺫﺍ !ﻚﻧﺄﺷ ﻦﻣ ﺲﻴﻟ ﺍﺬﻫ"
-    );
+    assert_eq!(result.output, "ﻦﻴﻠﻧَ ﻦْﻟ !ﻥﻵﺍ ﻚﺒﺘﻛ ﻲﻓ ﺐﻫﺫﺍ !ﻚﻧﺄﺷ ﻦﻣ ﺲﻴﻟ ﺍﺬﻫ");
     assert!(result.warnings.is_empty());
 }
 
