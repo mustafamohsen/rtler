@@ -113,7 +113,7 @@ private final class FloatingButtonView: NSView {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private static let savedPanelOriginKey = "RtlerFloating.panelOrigin"
+    private static let savedPanelOriginKey = "RTLer.panelOrigin"
     private static let defaultPanelOrigin = NSPoint(x: 80, y: 500)
 
     private var panel: NSPanel!
@@ -195,7 +195,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Open Accessibility Settings", action: #selector(openAccessibilitySettings), keyEquivalent: ""))
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Quit RTLER", action: #selector(quit), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: "Quit RTLer", action: #selector(quit), keyEquivalent: "q"))
         statusItem.menu = menu
     }
 

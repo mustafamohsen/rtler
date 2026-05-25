@@ -5,7 +5,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleExecutable</key>
-    <string>RtlerFloating</string>
+    <string>RTLer</string>
     <key>CFBundleIdentifier</key>
     <string>com.mustafamohsen.rtler.floating</string>
     <key>CFBundleIconFile</key>
@@ -13,9 +13,9 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>RTLER Floating</string>
+    <string>RTLer</string>
     <key>CFBundleDisplayName</key>
-    <string>RTLER</string>
+    <string>RTLer</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

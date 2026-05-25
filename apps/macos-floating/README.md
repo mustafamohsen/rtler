@@ -1,4 +1,4 @@
-# RTLER Floating macOS Experiment
+# RTLer macOS Experiment
 
 Experimental AppKit floating button for replacing selected text in the frontmost macOS app with RTLER output.
 
@@ -21,7 +21,7 @@ From the repo root:
 
 ```bash
 ./scripts/build-macos-floating-app.sh
-open dist/RtlerFloating.app
+open dist/RTLer.app
 ```
 
 The generated app is ad-hoc signed for local/private-alpha testing and bundles `librtler.dylib` inside the app.
@@ -30,7 +30,7 @@ The generated app is ad-hoc signed for local/private-alpha testing and bundles `
 
 ```bash
 cd apps/macos-floating
-swift run RtlerFloating
+swift run RTLer
 ```
 
 On first conversion, macOS may prompt for Accessibility permission. Grant permission in System Settings, then try again. The status bar `RTL` menu also includes an Accessibility Settings shortcut.

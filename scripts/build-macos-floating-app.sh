@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_NAME="RtlerFloating"
+APP_NAME="RTLer"
 BUNDLE_NAME="${APP_NAME}.app"
 DIST_DIR="${ROOT_DIR}/dist"
 APP_DIR="${DIST_DIR}/${BUNDLE_NAME}"

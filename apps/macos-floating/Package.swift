@@ -2,10 +2,10 @@
 import PackageDescription
 
 let package = Package(
-    name: "RtlerFloating",
+    name: "RTLer",
     platforms: [.macOS(.v13)],
     products: [
-        .executable(name: "RtlerFloating", targets: ["RtlerFloating"]),
+        .executable(name: "RTLer", targets: ["RTLer"]),
         .library(name: "RtlerFloatingCore", targets: ["RtlerFloatingCore"]),
     ],
     targets: [
@@ -15,7 +15,7 @@ let package = Package(
                 .unsafeFlags(["-L", "../../target/release", "-L", "../../target/debug", "-lrtler"]),
             ]
         ),
-        .executableTarget(name: "RtlerFloating", dependencies: ["RtlerFloatingCore"]),
+        .executableTarget(name: "RTLer", dependencies: ["RtlerFloatingCore"]),
         .testTarget(name: "RtlerFloatingTests", dependencies: ["RtlerFloatingCore"]),
     ]
 )
