@@ -82,6 +82,14 @@ fn preserves_digit_runs_in_left_to_right_order() {
 }
 
 #[test]
+fn preserves_common_numeric_runs_in_arabic_text() {
+    let result = transform("السعر ١٢٫٥٠ والخصم 50% في 2026/05/25");
+
+    assert_eq!(result.output, "2026/05/25 ﻲﻓ 50% ﻢﺼﺨﻟﺍﻭ ١٢٫٥٠ ﺮﻌﺴﻟﺍ");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn mirrors_paired_brackets_when_reordering() {
     let result = transform("(سلام)");
 

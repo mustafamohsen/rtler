@@ -86,7 +86,7 @@ fn collect_letters(input: &str) -> Vec<ArabicLetter> {
     while index < chars.len() {
         if is_digit(chars[index]) {
             let mut literal = String::new();
-            while index < chars.len() && is_digit(chars[index]) {
+            while index < chars.len() && is_numeric_run_char(chars[index]) {
                 literal.push(chars[index]);
                 index += 1;
             }
@@ -130,6 +130,10 @@ fn is_basic_arabic_mark(ch: char) -> bool {
 
 fn is_digit(ch: char) -> bool {
     ch.is_ascii_digit() || matches!(ch, '\u{0660}'..='\u{0669}' | '\u{06F0}'..='\u{06F9}')
+}
+
+fn is_numeric_run_char(ch: char) -> bool {
+    is_digit(ch) || matches!(ch, '.' | ',' | '/' | ':' | '%' | '\u{066B}' | '\u{066C}' | '\u{066A}')
 }
 
 fn is_unsupported_arabic_script_letter(ch: char) -> bool {
