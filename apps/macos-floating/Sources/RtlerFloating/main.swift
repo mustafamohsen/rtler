@@ -28,8 +28,6 @@ private final class FloatingButtonView: NSView {
         layer?.shadowOpacity = 0.22
         layer?.shadowRadius = 8
         layer?.shadowOffset = NSSize(width: 0, height: -2)
-        layer?.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        layer?.position = CGPoint(x: frame.midX, y: frame.midY)
 
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
@@ -114,8 +112,9 @@ private final class FloatingButtonView: NSView {
         scaleAnimation.toValue = scale
         scaleAnimation.duration = 0.18
         scaleAnimation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        scaleAnimation.autoreverses = true
         layer.add(scaleAnimation, forKey: "rtler.feedback.scale")
-        layer.setAffineTransform(CGAffineTransform(scaleX: scale, y: scale))
+        layer.setAffineTransform(.identity)
     }
 }
 
