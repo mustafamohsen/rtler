@@ -75,14 +75,45 @@ private final class FloatingButtonView: NSView {
         didDrag = false
     }
 
-    func showFeedback(title: String, color: NSColor, duration: TimeInterval = 0.75) {
-        label.stringValue = title
-        layer?.backgroundColor = color.cgColor
+    func showFeedback(title: String, color: NSColor, duration: TimeInterval = 0.55) {
+        animateFeedbackTransition(title: title, color: color, scale: 1.06)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
-            self?.label.stringValue = "RTL"
-            self?.layer?.backgroundColor = NSColor.systemBlue.cgColor
+            self?.animateFeedbackTransition(title: "RTL", color: .systemBlue, scale: 1.0)
         }
+    }
+
+    private func animateFeedbackTransition(title: String, color: NSColor, scale: CGFloat) {
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.16
+            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            label.animator().alphaValue = 0
+        } completionHandler: { [weak self] in
+            guard let self else { return }
+            self.label.stringValue = title
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.18
+                context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                self.label.animator().alphaValue = 1
+            }
+        }
+
+        guard let layer else { return }
+        let colorAnimation = CABasicAnimation(keyPath: "backgroundColor")
+        colorAnimation.fromValue = layer.presentation()?.backgroundColor ?? layer.backgroundColor
+        colorAnimation.toValue = color.cgColor
+        colorAnimation.duration = 0.18
+        colorAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        layer.add(colorAnimation, forKey: "rtler.feedback.backgroundColor")
+        layer.backgroundColor = color.cgColor
+
+        let scaleAnimation = CABasicAnimation(keyPath: "transform.scale")
+        scaleAnimation.fromValue = layer.presentation()?.value(forKeyPath: "transform.scale") ?? 1.0
+        scaleAnimation.toValue = scale
+        scaleAnimation.duration = 0.18
+        scaleAnimation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        layer.add(scaleAnimation, forKey: "rtler.feedback.scale")
+        layer.setAffineTransform(CGAffineTransform(scaleX: scale, y: scale))
     }
 }
 
