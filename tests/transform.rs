@@ -1,6 +1,14 @@
 use rtler::transform;
 
 #[test]
+fn matches_arabic_smoke_fixture() {
+    let result = transform(include_str!("../fixtures/arabic-smoke-input.txt"));
+
+    assert_eq!(result.output, include_str!("../fixtures/arabic-smoke-expected.txt"));
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn shapes_and_reverses_a_pure_arabic_word() {
     let result = transform("سلام");
 
