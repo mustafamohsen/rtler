@@ -12,6 +12,17 @@ fn matches_arabic_smoke_fixture() {
 }
 
 #[test]
+fn matches_mixed_arabic_smoke_fixture() {
+    let result = transform(include_str!("../fixtures/mixed-arabic-smoke-input.txt"));
+
+    assert_eq!(
+        result.output,
+        include_str!("../fixtures/mixed-arabic-smoke-expected.txt")
+    );
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn shapes_and_reverses_a_pure_arabic_word() {
     let result = transform("سلام");
 

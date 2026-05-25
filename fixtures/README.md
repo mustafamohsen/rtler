@@ -7,6 +7,9 @@ This fixture is a manual visual QA sample for Affinity-like tools that do not su
 ```bash
 cargo run --quiet < fixtures/arabic-smoke-input.txt > /tmp/rtler-output.txt
 diff -u fixtures/arabic-smoke-expected.txt /tmp/rtler-output.txt
+
+cargo run --quiet < fixtures/mixed-arabic-smoke-input.txt > /tmp/rtler-mixed-output.txt
+diff -u fixtures/mixed-arabic-smoke-expected.txt /tmp/rtler-mixed-output.txt
 ```
 
 ## Manual visual check

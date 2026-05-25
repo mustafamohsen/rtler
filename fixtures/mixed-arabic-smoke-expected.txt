@@ -1,0 +1,4 @@
+.ﻥﻵﺍ ﺔﻴﺑﺮﻌﻟﺍ ﻢﻋﺪﻳ Adobe
+.ﻥﻵﺍ test@example.com ﻞﺳﺍﺭ ﻭﺃ https://example.com ﺭﺯ
+.ﻥﻵﺍ #Arabic ﻭ @rtler ﻊﺑﺎﺗﻭ guide-v1.2.pdf ﺢﺘﻓﺍ
+2026/05/25. ﻰﺘﺣ 50% ﺮﻌﺴﺑ ﺡﺎﺘﻣ v1.0 RTLER
