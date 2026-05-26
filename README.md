@@ -17,31 +17,51 @@
   <a href="README.ur.md">اُردو</a>
 </p>
 
-RTLer converts Arabic-script text from normal logical Unicode into visual-order, pre-shaped compatibility text for apps that do not properly support right-to-left layout or Arabic shaping.
+RTLer is a small tool for the annoying cases where Arabic-script text breaks after you paste it into a design or publishing app.
 
-It is intended for design and publishing workflows where Arabic, Urdu, or Persian text appears disconnected, reversed, or otherwise broken after pasting into the target app.
+It takes normal Unicode text and turns it into visual-order, pre-shaped compatibility text. In plain English: if the target app refuses to handle right-to-left layout or Arabic shaping properly, RTLer gives you text that is more likely to look right anyway.
+
+It works with Arabic, Urdu, and Persian.
+
+## When to use it
+
+Use RTLer when your text shows up reversed, disconnected, or scrambled in the app you actually need to use.
+
+Typical cases:
+
+- Posters, social graphics, and presentation slides.
+- Design tools with weak RTL support.
+- Publishing workflows where the final output matters more than editable source text.
+- Mixed Arabic-script text with URLs, emails, numbers, or filenames.
 
 ## What it does
 
 - Shapes Arabic-script letters into Unicode presentation forms.
 - Reorders text for visual right-to-left display.
-- Preserves common left-to-right runs such as URLs, emails, numbers, and filenames.
-- Supports Arabic, Persian, and Urdu core text cases.
-- Provides both a Rust CLI/library and an experimental macOS app.
+- Leaves common left-to-right runs, such as URLs and emails, in a usable order.
+- Handles the core Arabic, Persian, and Urdu cases covered by the test suite.
+- Ships as a Rust CLI/library, with a beta macOS app for selected-text workflows.
 
-## Important caveat
+## Keep the original text
 
-RTLer output is **visual compatibility text**. It is meant to look correct in apps with poor RTL support, not to remain semantically clean Unicode.
+RTLer output is meant for compatibility, not clean editing.
 
-Keep your original source text. The transformed output is not ideal for editing, searching, spellchecking, accessibility, or linguistic processing.
+Keep a copy of your original text somewhere safe. The transformed version may look right, but it is not what you want for search, spellcheck, screen readers, linguistic processing, or later editing.
+
+Think of RTLer output as paste-ready artwork text, not your source of truth.
 
 ## macOS app beta
 
-The macOS beta provides a small floating button for transforming selected text in the frontmost app.
+The macOS beta adds a small floating button. Select text in another app, click the button, and RTLer replaces the selection with the transformed version.
 
-Download the latest beta from GitHub Releases, unzip `RTLer.app`, open it, and grant Accessibility permission when prompted.
+To try it:
 
-The app uses clipboard-mediated copy/paste automation, so behavior may vary by target application. Clipboard preservation currently targets plain text.
+1. Download the latest beta from GitHub Releases.
+2. Unzip `RTLer.app`.
+3. Open it.
+4. Grant Accessibility permission when macOS asks.
+
+The app uses the clipboard to copy and paste the selected text. That makes it work across many apps, but it also means some apps will behave differently. Clipboard preservation currently focuses on plain text.
 
 ## CLI usage
 
@@ -51,7 +71,7 @@ Build from source:
 cargo build --release
 ```
 
-Run examples:
+Run a few examples:
 
 ```bash
 cargo run -- "سلام"
@@ -59,14 +79,14 @@ echo "هذا نص عربي" | cargo run --quiet
 cargo run -- --help
 ```
 
-If installed as `rtler`:
+If you have installed it as `rtler`:
 
 ```bash
 rtler "سلام"
 echo "هذا نص عربي" | rtler
 ```
 
-Warnings are printed to stderr. Transformed text is printed to stdout.
+Warnings go to stderr. The transformed text goes to stdout.
 
 ## Rust library usage
 
@@ -95,6 +115,6 @@ cargo run --quiet < fixtures/persian-smoke-input.txt | diff -u fixtures/persian-
 
 ## Project status
 
-RTLer is in beta. The core transform is covered by automated tests, and the macOS app is available as an experimental beta for real-world testing in design tools.
+RTLer is beta software. The Rust transform has automated test coverage. The macOS app is still experimental and needs real use in design tools to shake out rough edges.
 
 See `DESIGN.md` for implementation notes and tradeoffs.
