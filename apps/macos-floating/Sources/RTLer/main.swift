@@ -126,11 +126,6 @@ private final class FloatingButtonView: NSView {
         animatePress(isPressed: true)
     }
 
-    override func rightMouseDown(with event: NSEvent) {
-        guard let menu else { return }
-        NSMenu.popUpContextMenu(menu, with: event, for: self)
-    }
-
     override func mouseDragged(with event: NSEvent) {
         guard let mouseDownScreenLocation, let initialWindowOrigin else { return }
 
@@ -310,7 +305,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         buttonView.onDragEnd = { [weak self] in
             self?.savePanelOrigin()
         }
-        buttonView.menu = createFloatingButtonContextMenu()
 
         panel.contentView = buttonView
         panel.orderFrontRegardless()
@@ -349,31 +343,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             statusItem.button?.title = "RTL"
         }
 
-        statusItem.menu = createStatusMenuItems(includeShow: true)
-    }
-
-    private func createFloatingButtonContextMenu() -> NSMenu {
-        createStatusMenuItems(includeShow: false)
-    }
-
-    private func createStatusMenuItems(includeShow: Bool) -> NSMenu {
         let menu = NSMenu()
-        if includeShow {
-            menu.addItem(menuItem(title: "Show Floating Button", action: #selector(showFloatingButton)))
-        }
-        menu.addItem(menuItem(title: "Hide Floating Button", action: #selector(hideFloatingButton)))
-        menu.addItem(menuItem(title: "Reset Button Position", action: #selector(resetButtonPosition)))
+        menu.addItem(NSMenuItem(title: "Show Floating Button", action: #selector(showFloatingButton), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Hide Floating Button", action: #selector(hideFloatingButton), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Reset Button Position", action: #selector(resetButtonPosition), keyEquivalent: ""))
         menu.addItem(.separator())
-        menu.addItem(menuItem(title: "Open Accessibility Settings", action: #selector(openAccessibilitySettings)))
+        menu.addItem(NSMenuItem(title: "Open Accessibility Settings", action: #selector(openAccessibilitySettings), keyEquivalent: ""))
         menu.addItem(.separator())
-        menu.addItem(menuItem(title: "Quit RTLer", action: #selector(quit), keyEquivalent: "q"))
-        return menu
-    }
-
-    private func menuItem(title: String, action: Selector, keyEquivalent: String = "") -> NSMenuItem {
-        let item = NSMenuItem(title: title, action: action, keyEquivalent: keyEquivalent)
-        item.target = self
-        return item
+        menu.addItem(NSMenuItem(title: "Quit RTLer", action: #selector(quit), keyEquivalent: "q"))
+        statusItem.menu = menu
     }
 
     private func loadStatusIcon() -> NSImage? {
