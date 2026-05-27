@@ -53,6 +53,14 @@ fn shapes_and_reverses_a_pure_arabic_word() {
 }
 
 #[test]
+fn keeps_yeh_terminal_before_standalone_hamza() {
+    let result = transform("شيء");
+
+    assert_eq!(result.output, "ﺀﻲﺷ");
+    assert!(result.warnings.is_empty());
+}
+
+#[test]
 fn normalizes_existing_presentation_forms_before_transforming() {
     let result = transform("سﻼم");
 

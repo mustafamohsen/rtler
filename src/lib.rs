@@ -319,7 +319,7 @@ impl ArabicLetter {
     }
 
     fn can_connect_to_right(&self) -> bool {
-        self.forms.is_some() || self.lam_alef.is_some()
+        self.base != 'ء' && (self.forms.is_some() || self.lam_alef.is_some())
     }
 
     fn can_connect_to_left(&self) -> bool {
