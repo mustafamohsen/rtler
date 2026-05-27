@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Mustafa Mohsen
+// SPDX-License-Identifier: MIT
+
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 

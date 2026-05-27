@@ -54,3 +54,9 @@ On first conversion, macOS may prompt for Accessibility permission. Grant permis
 - Replacement is plain text.
 - Clipboard preservation currently targets plain text, not rich clipboard payloads.
 - The floating panel may still affect focus in some app/window configurations.
+
+## Notices
+
+Developed by Mustafa Mohsen.
+
+Copyright (c) 2026 Mustafa Mohsen. Licensed under the MIT License; see `../../LICENSE`.

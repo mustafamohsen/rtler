@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Mustafa Mohsen
+# SPDX-License-Identifier: MIT
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -43,6 +45,8 @@ cp "${SWIFT_BUILD_DIR}/${APP_NAME}" "${MACOS_DIR}/${APP_NAME}"
 cp "${SWIFT_DIR}/Resources/Info.plist" "${CONTENTS_DIR}/Info.plist"
 cp "${SWIFT_DIR}/Resources/AppIcon.icns" "${RESOURCES_DIR}/AppIcon.icns"
 cp "${SWIFT_DIR}/Resources/MenuBarIconTemplate.png" "${RESOURCES_DIR}/MenuBarIconTemplate.png"
+cp "${ROOT_DIR}/LICENSE" "${RESOURCES_DIR}/LICENSE"
+cp "${ROOT_DIR}/NOTICE" "${RESOURCES_DIR}/NOTICE"
 
 RUST_LIB="$(find "${ROOT_DIR}/target/${CARGO_PROFILE}" "${ROOT_DIR}/target/${CARGO_PROFILE}/deps" -maxdepth 1 -name 'librtler.dylib' -print -quit)"
 if [[ -z "${RUST_LIB}" ]]; then

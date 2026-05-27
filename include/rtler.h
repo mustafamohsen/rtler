@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Mustafa Mohsen
+// SPDX-License-Identifier: MIT
+
 #ifndef RTLER_H
 #define RTLER_H
 

@@ -118,3 +118,9 @@ cargo run --quiet < fixtures/persian-smoke-input.txt | diff -u fixtures/persian-
 RTLer is beta software. The Rust transform has automated test coverage. The macOS app is still experimental and needs real use in design tools to shake out rough edges.
 
 See `DESIGN.md` for implementation notes and tradeoffs.
+
+## Notices
+
+Developed by Mustafa Mohsen.
+
+Copyright (c) 2026 Mustafa Mohsen. Licensed under the [MIT License](LICENSE).

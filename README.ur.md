@@ -98,3 +98,9 @@ cargo run --quiet < fixtures/persian-smoke-input.txt | diff -u fixtures/persian-
 RTLer beta مرحلے میں ہے۔ core transform automated tests سے covered ہے، اور macOS app design tools میں real-world testing کے لیے experimental beta کے طور پر دستیاب ہے۔
 
 implementation notes اور tradeoffs کے لیے `DESIGN.md` دیکھیں۔
+
+## Notices
+
+Developed by Mustafa Mohsen.
+
+Copyright (c) 2026 Mustafa Mohsen. [MIT License](LICENSE) کے تحت licensed ہے۔

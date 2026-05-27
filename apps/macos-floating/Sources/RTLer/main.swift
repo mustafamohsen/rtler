@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Mustafa Mohsen
+// SPDX-License-Identifier: MIT
+
 import AppKit
 import RtlerFloatingCore
 
@@ -350,8 +353,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Open Accessibility Settings", action: #selector(openAccessibilitySettings), keyEquivalent: ""))
         menu.addItem(.separator())
+        menu.addItem(disabledMenuItem(title: "Developed by Mustafa Mohsen"))
+        menu.addItem(disabledMenuItem(title: "MIT License"))
+        menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit RTLer", action: #selector(quit), keyEquivalent: "q"))
         statusItem.menu = menu
+    }
+
+    private func disabledMenuItem(title: String) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        item.isEnabled = false
+        return item
     }
 
     private func loadStatusIcon() -> NSImage? {

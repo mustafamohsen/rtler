@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Mustafa Mohsen
+// SPDX-License-Identifier: MIT
+
 use std::io::{self, Read};
 
 fn main() -> io::Result<()> {
@@ -5,7 +8,7 @@ fn main() -> io::Result<()> {
 
     if matches!(arg.as_deref(), Some("--help") | Some("-h")) {
         println!(
-            "Usage: rtler [TEXT]\n\nTransform Arabic-script text for non-RTL/non-shaping environments.\n\nIf TEXT is omitted, rtler reads stdin and writes transformed text to stdout."
+            "Usage: rtler [TEXT]\n\nTransform Arabic-script text for non-RTL/non-shaping environments.\n\nIf TEXT is omitted, rtler reads stdin and writes transformed text to stdout.\n\nDeveloped by Mustafa Mohsen.\nLicensed under the MIT License."
         );
         return Ok(());
     }

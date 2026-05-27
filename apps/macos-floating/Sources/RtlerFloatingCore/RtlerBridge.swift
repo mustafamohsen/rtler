@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Mustafa Mohsen
+// SPDX-License-Identifier: MIT
+
 import Foundation
 
 @_silgen_name("rtler_transform_text")

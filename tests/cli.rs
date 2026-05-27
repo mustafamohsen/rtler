@@ -47,6 +47,8 @@ fn cli_prints_help() {
     let stdout = String::from_utf8(output.stdout).unwrap();
     assert!(stdout.contains("Usage:"));
     assert!(stdout.contains("rtler [TEXT]"));
+    assert!(stdout.contains("Developed by Mustafa Mohsen"));
+    assert!(stdout.contains("MIT License"));
 }
 
 #[test]
